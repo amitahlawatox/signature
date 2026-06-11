@@ -12,30 +12,34 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
   const [pen, setPen]           = useState(PEN_TYPES[0]);
   const [paper, setPaper]       = useState(PAPER_TYPES[0]);
   const [fontSize, setFontSize] = useState(52);
-  const [downloaded, setDl]     = useState(false);
-  const [svgDl, setSvgDl]       = useState(false);
+  const [dlPng, setDlPng]       = useState(false);
+  const [dlSvg, setDlSvg]       = useState(false);
+  const [dlTrans, setDlTrans]   = useState(false);
 
   // Draw tab state
-  const canvasRef       = useRef<HTMLCanvasElement>(null);
-  const isDrawing       = useRef(false);
-  const lastPos         = useRef<{ x: number; y: number } | null>(null);
+  const canvasRef        = useRef<HTMLCanvasElement>(null);  // visible (has paper bg)
+  const strokesRef       = useRef<HTMLCanvasElement>(null);  // off-screen, strokes only
+  const isDrawing        = useRef(false);
+  const lastPos          = useRef<{ x: number; y: number } | null>(null);
   const [hasStrokes, setHasStrokes] = useState(false);
   const [drawPen, setDrawPen]       = useState(PEN_TYPES[0]);
   const [drawPaper, setDrawPaper]   = useState(PAPER_TYPES[0]);
   const [brushSize, setBrushSize]   = useState(2);
+  const [dlDraw, setDlDraw]         = useState(false);
+  const [dlDrawTrans, setDlDrawTrans] = useState(false);
 
   const displayName = name.trim() || 'Your Name';
 
-  // ── Canvas draw helpers ──────────────────────────────────────────
+  // ── Canvas helpers ───────────────────────────────────────────────
   const getPos = (e: MouseEvent | TouchEvent, canvas: HTMLCanvasElement) => {
     const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
+    const sx = canvas.width / rect.width;
+    const sy = canvas.height / rect.height;
     if ('touches' in e) {
       const t = e.touches[0];
-      return { x: (t.clientX - rect.left) * scaleX, y: (t.clientY - rect.top) * scaleY };
+      return { x: (t.clientX - rect.left) * sx, y: (t.clientY - rect.top) * sy };
     }
-    return { x: ((e as MouseEvent).clientX - rect.left) * scaleX, y: ((e as MouseEvent).clientY - rect.top) * scaleY };
+    return { x: ((e as MouseEvent).clientX - rect.left) * sx, y: ((e as MouseEvent).clientY - rect.top) * sy };
   };
 
   const fillCanvasBg = useCallback(() => {
@@ -49,18 +53,27 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
       }
     }
-    ctx.strokeStyle = drawPaper.rule; ctx.lineWidth = 0.7;
-    ctx.setLineDash([5, 5]);
+    ctx.strokeStyle = drawPaper.rule; ctx.lineWidth = 0.7; ctx.setLineDash([5, 5]);
     const baseY = canvas.height - 40;
     ctx.beginPath(); ctx.moveTo(30, baseY); ctx.lineTo(canvas.width - 30, baseY); ctx.stroke();
     ctx.setLineDash([]);
+
+    // Also clear the strokes-only canvas
+    const sc = strokesRef.current;
+    if (sc) sc.getContext('2d')!.clearRect(0, 0, sc.width, sc.height);
   }, [drawPaper]);
 
   useEffect(() => {
     if (tab !== 'draw') return;
-    const canvas = canvasRef.current; if (!canvas) return;
     fillCanvasBg();
+    setHasStrokes(false);
   }, [tab, drawPaper, fillCanvasBg]);
+
+  // Initialise strokes canvas size to match display canvas
+  useEffect(() => {
+    const sc = strokesRef.current; if (!sc) return;
+    sc.width = 700; sc.height = 200;
+  }, []);
 
   const startDraw = useCallback((e: MouseEvent | TouchEvent) => {
     const canvas = canvasRef.current; if (!canvas) return;
@@ -69,23 +82,32 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
     lastPos.current = getPos(e, canvas);
   }, []);
 
-  const draw = useCallback((e: MouseEvent | TouchEvent) => {
+  const drawStroke = useCallback((e: MouseEvent | TouchEvent) => {
     if (!isDrawing.current) return;
     const canvas = canvasRef.current; if (!canvas) return;
     e.preventDefault();
-    const ctx = canvas.getContext('2d')!;
-    const pos = getPos(e, canvas);
+    const pos  = getPos(e, canvas);
     const last = lastPos.current || pos;
-    ctx.beginPath();
-    ctx.moveTo(last.x, last.y);
-    ctx.lineTo(pos.x, pos.y);
-    ctx.strokeStyle = drawPen.color;
-    ctx.lineWidth = brushSize;
-    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    if (drawPen.category === 'ink') ctx.globalAlpha = 0.88;
-    else ctx.globalAlpha = 1;
-    ctx.stroke();
-    ctx.globalAlpha = 1;
+
+    const paint = (ctx: CanvasRenderingContext2D) => {
+      ctx.beginPath();
+      ctx.moveTo(last.x, last.y);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.strokeStyle = drawPen.color;
+      ctx.lineWidth   = brushSize;
+      ctx.lineCap     = 'round';
+      ctx.lineJoin    = 'round';
+      ctx.globalAlpha = drawPen.category === 'ink' ? 0.88 : 1;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    };
+
+    paint(canvas.getContext('2d')!);
+
+    // Mirror to the transparent strokes canvas
+    const sc = strokesRef.current;
+    if (sc) paint(sc.getContext('2d')!);
+
     lastPos.current = pos;
     setHasStrokes(true);
   }, [drawPen, brushSize]);
@@ -98,63 +120,66 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
   useEffect(() => {
     const canvas = canvasRef.current; if (!canvas) return;
     canvas.addEventListener('mousedown',  startDraw as any);
-    canvas.addEventListener('mousemove',  draw as any);
+    canvas.addEventListener('mousemove',  drawStroke as any);
     canvas.addEventListener('mouseup',    endDraw);
     canvas.addEventListener('mouseleave', endDraw);
     canvas.addEventListener('touchstart', startDraw as any, { passive: false });
-    canvas.addEventListener('touchmove',  draw as any, { passive: false });
+    canvas.addEventListener('touchmove',  drawStroke as any, { passive: false });
     canvas.addEventListener('touchend',   endDraw);
     return () => {
       canvas.removeEventListener('mousedown',  startDraw as any);
-      canvas.removeEventListener('mousemove',  draw as any);
+      canvas.removeEventListener('mousemove',  drawStroke as any);
       canvas.removeEventListener('mouseup',    endDraw);
       canvas.removeEventListener('mouseleave', endDraw);
       canvas.removeEventListener('touchstart', startDraw as any);
-      canvas.removeEventListener('touchmove',  draw as any);
+      canvas.removeEventListener('touchmove',  drawStroke as any);
       canvas.removeEventListener('touchend',   endDraw);
     };
-  }, [startDraw, draw, endDraw]);
+  }, [startDraw, drawStroke, endDraw]);
 
-  const clearCanvas = useCallback(() => {
-    fillCanvasBg(); setHasStrokes(false);
-  }, [fillCanvasBg]);
+  const clearCanvas = useCallback(() => { fillCanvasBg(); setHasStrokes(false); }, [fillCanvasBg]);
 
   // ── Downloads ────────────────────────────────────────────────────
-  const downloadTypePNG = useCallback(() => {
+  const mkTypeCanvas = (transparent: boolean) => {
     const canvas = document.createElement('canvas');
     const scale  = 3;
-    canvas.width = 700 * scale; canvas.height = 220 * scale;
+    canvas.width  = 700 * scale;
+    canvas.height = 220 * scale;
     const ctx = canvas.getContext('2d')!;
     ctx.scale(scale, scale);
-    ctx.fillStyle = paper.id === 'none' ? '#ffffff' : paper.bg;
-    ctx.fillRect(0, 0, 700, 220);
-    if (paper.id === 'lined') {
-      ctx.strokeStyle = paper.rule; ctx.lineWidth = 0.8;
-      for (let y = 30; y < 220; y += 28) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(700, y); ctx.stroke(); }
+    if (!transparent) {
+      ctx.fillStyle = paper.id === 'none' ? '#ffffff' : paper.bg;
+      ctx.fillRect(0, 0, 700, 220);
+      if (paper.id === 'lined') {
+        ctx.strokeStyle = paper.rule; ctx.lineWidth = 0.8;
+        for (let y = 30; y < 220; y += 28) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(700, y); ctx.stroke(); }
+      }
+      ctx.strokeStyle = paper.rule; ctx.lineWidth = 0.6; ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(60, 158); ctx.lineTo(640, 158); ctx.stroke(); ctx.setLineDash([]);
     }
-    ctx.strokeStyle = paper.rule; ctx.lineWidth = 0.6; ctx.setLineDash([4, 4]);
-    ctx.beginPath(); ctx.moveTo(60, 158); ctx.lineTo(640, 158); ctx.stroke(); ctx.setLineDash([]);
     ctx.fillStyle = pen.color;
     ctx.font = `${selectedFont.weight} ${fontSize}px '${selectedFont.family}', cursive`;
     ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
     ctx.fillText(displayName, 350, 150);
+    return canvas;
+  };
+
+  const downloadTypePNG = useCallback(() => {
     const link = document.createElement('a');
     link.download = `${displayName.toLowerCase().replace(/\s+/g, '-')}-signature.png`;
-    link.href = canvas.toDataURL('image/png'); link.click();
-    setDl(true); setTimeout(() => setDl(false), 2500);
+    link.href = mkTypeCanvas(false).toDataURL('image/png'); link.click();
+    setDlPng(true); setTimeout(() => setDlPng(false), 2500);
   }, [name, selectedFont, pen, paper, fontSize, displayName]);
 
-  const downloadDrawPNG = useCallback(() => {
-    const src = canvasRef.current; if (!src) return;
+  const downloadTypeTransparent = useCallback(() => {
     const link = document.createElement('a');
-    link.download = 'my-handwritten-signature.png';
-    link.href = src.toDataURL('image/png'); link.click();
-    setDl(true); setTimeout(() => setDl(false), 2500);
-  }, []);
+    link.download = `${displayName.toLowerCase().replace(/\s+/g, '-')}-signature-transparent.png`;
+    link.href = mkTypeCanvas(true).toDataURL('image/png'); link.click();
+    setDlTrans(true); setTimeout(() => setDlTrans(false), 2500);
+  }, [name, selectedFont, pen, paper, fontSize, displayName]);
 
   const downloadTypeSVG = useCallback(() => {
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="700" height="220" viewBox="0 0 700 220">
-  <rect width="700" height="220" fill="${paper.id === 'none' ? '#ffffff' : paper.bg}"/>
   <line x1="60" y1="158" x2="640" y2="158" stroke="${paper.rule}" stroke-width="0.6" stroke-dasharray="4 4"/>
   <text x="350" y="150" text-anchor="middle" dominant-baseline="alphabetic"
     font-family="${selectedFont.family}, cursive"
@@ -166,30 +191,53 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
     const link = document.createElement('a');
     link.download = `${displayName.toLowerCase().replace(/\s+/g, '-')}-signature.svg`;
     link.href = url; link.click(); URL.revokeObjectURL(url);
-    setSvgDl(true); setTimeout(() => setSvgDl(false), 2500);
+    setDlSvg(true); setTimeout(() => setDlSvg(false), 2500);
   }, [name, selectedFont, pen, paper, fontSize, displayName]);
 
-  // ── Shared styling helpers ───────────────────────────────────────
+  const downloadDrawPNG = useCallback(() => {
+    const src = canvasRef.current; if (!src) return;
+    const link = document.createElement('a');
+    link.download = 'my-handwritten-signature.png';
+    link.href = src.toDataURL('image/png'); link.click();
+    setDlDraw(true); setTimeout(() => setDlDraw(false), 2500);
+  }, []);
+
+  const downloadDrawTransparent = useCallback(() => {
+    const sc = strokesRef.current; if (!sc) return;
+    const link = document.createElement('a');
+    link.download = 'my-handwritten-signature-transparent.png';
+    link.href = sc.toDataURL('image/png'); link.click();
+    setDlDrawTrans(true); setTimeout(() => setDlDrawTrans(false), 2500);
+  }, []);
+
+  // ── Style helpers ────────────────────────────────────────────────
   const ballpointPens = PEN_TYPES.filter(p => p.category === 'ballpoint');
   const inkPens       = PEN_TYPES.filter(p => p.category === 'ink');
   const gelPens       = PEN_TYPES.filter(p => p.category === 'gel');
 
-  const accentGrad   = { background: 'linear-gradient(135deg, var(--color-accent), var(--color-accent-light))' };
-  const accentCard   = { background: 'var(--color-accent-subtle)', border: '1px solid var(--color-accent-border)' };
-  const accentTxt    = { color: 'var(--color-accent)' };
+  const accentGrad = { background: 'linear-gradient(135deg, var(--color-accent), var(--color-accent-light))' };
+  const accentCard = { background: 'var(--color-accent-subtle)', border: '1px solid var(--color-accent-border)' };
+  const accentTxt  = { color: 'var(--color-accent)' };
 
   const PenGroups = ({ activePen, onSelect }: { activePen: typeof PEN_TYPES[0]; onSelect: (p: typeof PEN_TYPES[0]) => void }) => (
     <div className="rounded-2xl p-5" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
       <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--color-text-muted)' }}>Pen Type</p>
       <div className="space-y-4">
-        {[{ label: 'Ballpoint', pens: ballpointPens }, { label: 'Ink Pen', pens: inkPens }, { label: 'Gel Pen', pens: gelPens }].map(group => (
+        {[
+          { label: 'Ballpoint', pens: ballpointPens },
+          { label: 'Ink Pen',   pens: inkPens },
+          { label: 'Gel Pen',   pens: gelPens },
+        ].map(group => (
           <div key={group.label}>
             <p className="text-xs font-semibold mb-2" style={{ color: 'var(--color-text-muted)', opacity: 0.65 }}>{group.label}</p>
             <div className="flex flex-wrap gap-2">
               {group.pens.map(p => (
                 <button key={p.id} onClick={() => onSelect(p)}
                   className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold transition-all"
-                  style={activePen.id === p.id ? { ...accentCard, ...accentTxt } : { background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}>
+                  style={activePen.id === p.id
+                    ? { ...accentCard, ...accentTxt }
+                    : { background: 'var(--color-surface-2)', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }
+                  }>
                   <span className="inline-block w-3 h-3 rounded-full flex-shrink-0"
                     style={{ background: p.color, border: '1px solid rgba(0,0,0,0.12)', boxShadow: activePen.id === p.id ? `0 0 5px ${p.color}50` : 'none' }} />
                   {p.label}
@@ -210,9 +258,9 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
       <div className="flex gap-1 p-1 rounded-xl w-fit"
         style={{ background: 'var(--color-surface-2)', border: '1px solid var(--color-border)' }}>
         {([
-          { id: 'type', label: '✦ Type a Name' },
-          { id: 'draw', label: '✍ Draw by Hand' },
-        ] as const).map(t => (
+          { id: 'type' as const, label: '✦ Type a Name' },
+          { id: 'draw' as const, label: '✍ Draw by Hand' },
+        ]).map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             className="rounded-lg px-5 py-2 text-sm font-bold transition-all"
             style={tab === t.id
@@ -224,7 +272,7 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
         ))}
       </div>
 
-      {/* ════════════════════ TYPE TAB ════════════════════ */}
+      {/* ═══════════════════ TYPE TAB ═══════════════════ */}
       {tab === 'type' && (
         <>
           {/* Name input */}
@@ -269,7 +317,7 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
           </div>
 
           {/* Controls */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="rounded-2xl p-4" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
               <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--color-text-muted)' }}>Size</p>
               <div className="flex gap-2 flex-wrap">
@@ -294,17 +342,35 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
                 ))}
               </div>
             </div>
-            <div className="rounded-2xl p-4 flex flex-col gap-2.5" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--color-text-muted)' }}>Download</p>
+          </div>
+
+          {/* Download panel */}
+          <div className="rounded-2xl p-5" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+            <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--color-text-muted)' }}>Download</p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* PNG with paper */}
               <button onClick={downloadTypePNG}
-                className="flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
+                className="flex flex-col items-center gap-1.5 rounded-xl p-4 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
                 style={{ ...accentGrad, boxShadow: '0 4px 16px rgba(29,63,110,0.2)' }}>
-                <DownloadIcon /> {downloaded ? '✓ Downloaded!' : 'Download PNG'}
+                <DownloadIcon />
+                <span>{dlPng ? '✓ Downloaded!' : 'PNG — With Paper'}</span>
+                <span className="text-xs font-normal opacity-80">3× retina · for emails</span>
               </button>
-              <button onClick={downloadTypeSVG}
-                className="flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold transition-all hover:opacity-80 active:scale-95"
+              {/* Transparent PNG */}
+              <button onClick={downloadTypeTransparent}
+                className="flex flex-col items-center gap-1.5 rounded-xl p-4 text-sm font-bold transition-all hover:opacity-80 active:scale-95"
                 style={{ border: '1.5px solid var(--color-accent-border)', ...accentTxt, background: 'var(--color-accent-subtle)' }}>
-                <DownloadIcon /> {svgDl ? '✓ Downloaded!' : 'Download SVG'}
+                <TransparentIcon />
+                <span>{dlTrans ? '✓ Downloaded!' : 'PNG — Transparent'}</span>
+                <span className="text-xs font-normal opacity-70">No background · overlay anywhere</span>
+              </button>
+              {/* SVG */}
+              <button onClick={downloadTypeSVG}
+                className="flex flex-col items-center gap-1.5 rounded-xl p-4 text-sm font-bold transition-all hover:opacity-80 active:scale-95"
+                style={{ border: '1.5px solid var(--color-border)', color: 'var(--color-text-muted)', background: 'var(--color-surface-2)' }}>
+                <VectorIcon />
+                <span>{dlSvg ? '✓ Downloaded!' : 'SVG — Vector'}</span>
+                <span className="text-xs font-normal opacity-70">Scalable · Figma / Illustrator</span>
               </button>
             </div>
           </div>
@@ -333,7 +399,8 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
                       </span>
                     )}
                   </div>
-                  <div className="rounded-lg overflow-hidden" style={{ background: '#fff', padding: '8px 16px 12px', border: '1px solid rgba(0,0,0,0.06)' }}>
+                  <div className="rounded-lg overflow-hidden"
+                    style={{ background: '#fff', padding: '8px 16px 12px', border: '1px solid rgba(0,0,0,0.06)' }}>
                     <div className="border-b border-dashed" style={{ borderColor: 'rgba(100,140,200,0.2)', paddingBottom: '6px' }}>
                       <div className={`leading-none overflow-hidden text-ellipsis whitespace-nowrap ${FONT_CLASS_MAP[font.family]}`}
                         style={{ fontSize: '40px', color: pen.color, fontWeight: font.weight, filter: pen.filter }}
@@ -350,16 +417,13 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
         </>
       )}
 
-      {/* ════════════════════ DRAW TAB ════════════════════ */}
+      {/* ═══════════════════ DRAW TAB ═══════════════════ */}
       {tab === 'draw' && (
         <>
-          {/* Canvas */}
+          {/* Visible canvas */}
           <div className="relative rounded-2xl overflow-hidden"
             style={{ border: '1px solid rgba(0,0,0,0.10)', boxShadow: '0 4px 24px rgba(0,0,0,0.07)', lineHeight: 0 }}>
-            <canvas
-              ref={canvasRef}
-              width={700}
-              height={200}
+            <canvas ref={canvasRef} width={700} height={200}
               className="w-full block"
               style={{ cursor: 'crosshair', touchAction: 'none', maxHeight: '220px' }}
               aria-label="Draw your signature here"
@@ -370,26 +434,28 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
               Clear
             </button>
           </div>
+          {/* Hidden strokes-only canvas */}
+          <canvas ref={strokesRef} width={700} height={200} style={{ display: 'none' }} aria-hidden="true" />
+
           <p className="text-xs text-center" style={{ color: 'var(--color-text-muted)' }}>
             Draw with your mouse or finger. Your signature stays on your device.
           </p>
 
           {/* Draw controls */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Brush size */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="rounded-2xl p-4" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
               <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--color-text-muted)' }}>Nib Size</p>
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-2 flex-wrap items-center">
                 {[1.5, 2, 3, 4, 5].map(s => (
                   <button key={s} onClick={() => setBrushSize(s)}
-                    className="w-9 h-9 rounded-lg flex items-center justify-center font-bold text-sm transition-all"
-                    style={brushSize === s ? { ...accentGrad, color: '#fff' } : { background: 'var(--color-surface-2)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)' }}>
-                    <span className="rounded-full" style={{ width: `${Math.max(2, s * 2.5)}px`, height: `${Math.max(2, s * 2.5)}px`, background: 'currentColor' }} />
+                    className="w-9 h-9 rounded-lg flex items-center justify-center transition-all"
+                    style={brushSize === s ? { ...accentGrad, color: '#fff' } : { background: 'var(--color-surface-2)', border: '1px solid var(--color-border)' }}>
+                    <span className="rounded-full"
+                      style={{ width: `${Math.max(3, s * 2.5)}px`, height: `${Math.max(3, s * 2.5)}px`, background: brushSize === s ? '#fff' : 'var(--color-text-muted)', display: 'block' }} />
                   </button>
                 ))}
               </div>
             </div>
-            {/* Paper */}
             <div className="rounded-2xl p-4" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
               <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--color-text-muted)' }}>Paper</p>
               <div className="flex gap-2 flex-wrap">
@@ -402,18 +468,30 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
                 ))}
               </div>
             </div>
-            {/* Download */}
-            <div className="rounded-2xl p-4 flex flex-col gap-2.5" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
-              <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--color-text-muted)' }}>Download</p>
+          </div>
+
+          {/* Download panel */}
+          <div className="rounded-2xl p-5" style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+            <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--color-text-muted)' }}>Download</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button onClick={downloadDrawPNG} disabled={!hasStrokes}
-                className="flex items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="flex flex-col items-center gap-1.5 rounded-xl p-4 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                 style={{ ...accentGrad, boxShadow: hasStrokes ? '0 4px 16px rgba(29,63,110,0.2)' : 'none' }}>
-                <DownloadIcon /> {downloaded ? '✓ Downloaded!' : 'Download PNG'}
+                <DownloadIcon />
+                <span>{dlDraw ? '✓ Downloaded!' : 'PNG — With Paper'}</span>
+                <span className="text-xs font-normal opacity-80">Exactly as shown above</span>
               </button>
-              <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                {hasStrokes ? 'Ready to download' : 'Draw your signature first'}
-              </p>
+              <button onClick={downloadDrawTransparent} disabled={!hasStrokes}
+                className="flex flex-col items-center gap-1.5 rounded-xl p-4 text-sm font-bold transition-all hover:opacity-80 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ border: '1.5px solid var(--color-accent-border)', ...accentTxt, background: 'var(--color-accent-subtle)' }}>
+                <TransparentIcon />
+                <span>{dlDrawTrans ? '✓ Downloaded!' : 'PNG — Transparent'}</span>
+                <span className="text-xs font-normal opacity-70">Ink strokes only · no background</span>
+              </button>
             </div>
+            {!hasStrokes && (
+              <p className="mt-3 text-xs text-center" style={{ color: 'var(--color-text-muted)' }}>Draw your signature above to enable downloads</p>
+            )}
           </div>
 
           <PenGroups activePen={drawPen} onSelect={setDrawPen} />
@@ -425,9 +503,26 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
 
 function DownloadIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
       <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+    </svg>
+  );
+}
+
+function TransparentIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <rect x="3" y="3" width="18" height="18" rx="2" strokeDasharray="4 2"/>
+      <path d="M7 17L17 7M7 7l10 10" strokeWidth="1.8"/>
+    </svg>
+  );
+}
+
+function VectorIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
     </svg>
   );
 }
