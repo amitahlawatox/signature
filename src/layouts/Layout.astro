@@ -19,7 +19,6 @@ const { title, description, canonical, ogImage = '/og-image.png', schema, noInde
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#7c3aed" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <title>{title}</title>
@@ -32,7 +31,6 @@ const { title, description, canonical, ogImage = '/og-image.png', schema, noInde
     <meta property="og:image" content={ogImage} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="SignatureMakr" />
-
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description.slice(0, 160)} />
@@ -41,26 +39,30 @@ const { title, description, canonical, ogImage = '/og-image.png', schema, noInde
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
     {schema && <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />}
 
+    <!-- Signature site is dark-first -->
     <script is:inline>
       (function(){
         try {
           var s = localStorage.getItem('sm-theme');
-          if(s==='dark'||(!s&&window.matchMedia('(prefers-color-scheme: dark)').matches))
-            document.documentElement.classList.add('dark');
-        } catch(e){}
+          if (s === 'light') document.documentElement.classList.add('light');
+          // dark is default, no class needed
+        } catch(e) {}
         window.__toggleTheme = function(){
-          var d = document.documentElement.classList.toggle('dark');
-          try { localStorage.setItem('sm-theme', d?'dark':'light'); } catch(e){}
+          var isLight = document.documentElement.classList.toggle('light');
+          try { localStorage.setItem('sm-theme', isLight ? 'light' : 'dark'); } catch(e) {}
         };
       })();
     </script>
     <slot name="head" />
   </head>
 
-  <body class="min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] antialiased">
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-violet-600 focus:px-4 focus:py-2 focus:text-white">
+  <body class="min-h-screen antialiased relative" style="background:var(--color-bg);color:var(--color-text);">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-violet-600 focus:px-4 focus:py-2 focus:text-white focus:outline-none">
       Skip to content
     </a>
+
+    <!-- Global grid background -->
+    <div class="grid-bg fixed inset-0 -z-10 pointer-events-none" aria-hidden="true"></div>
 
     <slot />
 
@@ -71,36 +73,41 @@ const { title, description, canonical, ogImage = '/og-image.png', schema, noInde
         var glow = document.getElementById('cursor-glow');
         var touch = window.matchMedia('(pointer: coarse)').matches;
         var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if(glow && !touch && !reduced){
+        if (glow && !touch && !reduced) {
           var gx=0,gy=0,cx=0,cy=0;
-          glow.style.opacity='1';
-          document.addEventListener('mousemove',function(e){ cx=e.clientX; cy=e.clientY; });
-          (function loop(){ gx+=(cx-gx)*0.08; gy+=(cy-gy)*0.08;
-            glow.style.left=gx+'px'; glow.style.top=gy+'px'; requestAnimationFrame(loop); })();
+          glow.style.opacity = '1';
+          document.addEventListener('mousemove', function(e){ cx=e.clientX; cy=e.clientY; });
+          (function loop(){ gx+=(cx-gx)*0.07; gy+=(cy-gy)*0.07;
+            glow.style.left=gx+'px'; glow.style.top=gy+'px';
+            requestAnimationFrame(loop); })();
         }
-        document.addEventListener('click',function(e){
-          var t=e.target.closest('a[href],button');
-          if(!t||reduced) return;
-          var r=t.getBoundingClientRect();
-          var rp=document.createElement('span');
-          rp.className='ripple-effect';
-          rp.style.left=(e.clientX-r.left)+'px'; rp.style.top=(e.clientY-r.top)+'px';
-          if(getComputedStyle(t).position==='static') t.style.position='relative';
-          t.style.overflow='hidden';
+        document.addEventListener('click', function(e){
+          var t = e.target.closest('a[href],button');
+          if (!t || reduced) return;
+          var r = t.getBoundingClientRect();
+          var rp = document.createElement('span');
+          rp.className = 'ripple-effect';
+          rp.style.left = (e.clientX-r.left)+'px';
+          rp.style.top  = (e.clientY-r.top)+'px';
+          if (getComputedStyle(t).position === 'static') t.style.position = 'relative';
+          t.style.overflow = 'hidden';
           t.appendChild(rp);
-          setTimeout(function(){ if(rp.parentNode) rp.parentNode.removeChild(rp); },700);
+          setTimeout(function(){ if(rp.parentNode) rp.parentNode.removeChild(rp); }, 700);
         });
       })();
     </script>
 
     <script is:inline>
       (function(){
-        if(typeof IntersectionObserver==='undefined') return;
+        if (typeof IntersectionObserver === 'undefined') return;
         var obs = new IntersectionObserver(function(entries){
-          entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('scroll-visible'); obs.unobserve(e.target); }});
-        },{ threshold:0.1, rootMargin:'0px 0px -40px 0px' });
+          entries.forEach(function(e){
+            if (e.isIntersecting){ e.target.classList.add('scroll-visible'); obs.unobserve(e.target); }
+          });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
         function observe(){ document.querySelectorAll('[data-scroll]').forEach(function(el){ obs.observe(el); }); }
-        if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',observe); else observe();
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', observe);
+        else observe();
       })();
     </script>
 
