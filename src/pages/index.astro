@@ -29,35 +29,24 @@ const schema = {
 
   <main id="main-content">
 
-    <!-- ── HERO ─────────────────────────────────────────────── -->
-    <section class="relative overflow-hidden pt-20 pb-16 sm:pt-28 sm:pb-24">
+    <!-- ── HERO ── -->
+    <section class="pt-16 pb-12 sm:pt-24 sm:pb-16" style="border-bottom:1px solid var(--color-border);">
+      <div class="mx-auto max-w-4xl px-4 sm:px-6 text-center">
 
-      <!-- Ambient orbs -->
-      <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
-        <div class="absolute -top-60 left-1/4 h-[500px] w-[500px] rounded-full opacity-20"
-          style="background:radial-gradient(circle,#7c3aed,transparent 70%);filter:blur(60px);"></div>
-        <div class="absolute top-10 right-0 h-[400px] w-[400px] rounded-full opacity-15"
-          style="background:radial-gradient(circle,#ec4899,transparent 70%);filter:blur(80px);"></div>
-        <div class="absolute bottom-0 left-0 h-[300px] w-[300px] rounded-full opacity-10"
-          style="background:radial-gradient(circle,#6366f1,transparent 70%);filter:blur(60px);"></div>
-      </div>
-
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
         <!-- Badge -->
-        <div class="mb-6 flex justify-center" data-scroll="fade">
-          <span class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold"
-            style="background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.25);color:#c4b5fd;">
-            ✦ 100% Free &nbsp;·&nbsp; No Sign-Up &nbsp;·&nbsp; Instant Download
-          </span>
+        <div class="mb-5 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold"
+          style="background:var(--color-accent-subtle);border:1px solid var(--color-accent-border);color:var(--color-accent);"
+          data-scroll="fade">
+          ✦ Free &nbsp;·&nbsp; No Sign-Up &nbsp;·&nbsp; Instant Download
         </div>
 
         <!-- Heading -->
-        <h1 class="text-center text-5xl font-black tracking-tight sm:text-7xl leading-none mb-6" data-scroll="fade">
+        <h1 class="text-4xl font-black tracking-tight sm:text-6xl leading-none mb-5" data-scroll="fade">
           <span class="gradient-text">Signature</span>
           <span style="color:var(--color-text);"> Generator</span>
         </h1>
-        <p class="mx-auto max-w-lg text-center text-lg mb-10" style="color:var(--color-text-muted);" data-scroll="fade">
-          Type your name. Choose from <strong style="color:var(--color-text);">10 elegant styles</strong>. Download as PNG or SVG in seconds — free, forever.
+        <p class="mx-auto max-w-lg text-base sm:text-lg mb-10" style="color:var(--color-text-muted);" data-scroll="fade">
+          Type your name. Pick from <strong style="color:var(--color-text);">10 professional styles</strong> with realistic pen effects. Download PNG or SVG — free, forever.
         </p>
 
         <!-- ── MAIN TOOL ── -->
@@ -68,12 +57,12 @@ const schema = {
     </section>
 
     <!-- ── AD SLOT ── -->
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 mb-14">
+    <div class="mx-auto max-w-4xl px-4 sm:px-6 my-12">
       <div class="ad-slot h-[90px]">· advertisement ·</div>
     </div>
 
     <!-- ── FEATURES ── -->
-    <section class="mx-auto max-w-6xl px-4 sm:px-6 py-12" data-scroll>
+    <section class="mx-auto max-w-5xl px-4 sm:px-6 py-12" data-scroll>
       <h2 class="text-2xl font-black text-center mb-2" style="color:var(--color-text);">Why SignatureMakr?</h2>
       <p class="text-center mb-10 text-sm" style="color:var(--color-text-muted);">Built different from the competition</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -82,11 +71,11 @@ const schema = {
           { icon: '✍️', title: '10 Unique Styles',   desc: 'From formal calligraphy to expressive brush lettering — all self-hosted fonts.' },
           { icon: '📥', title: 'PNG + SVG Download', desc: '3× retina PNG for email & docs. Scalable SVG for Illustrator & Figma.' },
           { icon: '🔒', title: 'Zero Tracking',      desc: 'No account, no email, no cookies. Everything stays in your browser.' },
-          { icon: '🎨', title: '10 Colors',          desc: 'Midnight navy, royal blue, violet, rose, forest, gold and more.' },
+          { icon: '🖊️', title: 'Realistic Ink',      desc: 'Ballpoint, fountain pen, and gel pen effects with CSS ink simulation.' },
           { icon: '📱', title: 'Works Everywhere',   desc: 'Pixel-perfect on mobile, tablet, and desktop. No app download needed.' },
         ].map(f => (
-          <div class="glass rounded-2xl p-6 transition-all hover:glow-violet-sm style-card">
-            <div class="mb-3 text-3xl">{f.icon}</div>
+          <div class="style-card rounded-2xl p-6" style="background:var(--color-surface);border:1px solid var(--color-border);">
+            <div class="mb-3 text-2xl">{f.icon}</div>
             <h3 class="font-bold mb-1.5" style="color:var(--color-text);">{f.title}</h3>
             <p class="text-sm leading-relaxed" style="color:var(--color-text-muted);">{f.desc}</p>
           </div>
@@ -95,54 +84,59 @@ const schema = {
     </section>
 
     <!-- ── BY NAME ── -->
-    <section class="mx-auto max-w-6xl px-4 sm:px-6 py-12" data-scroll>
-      <div class="rounded-3xl p-8 sm:p-12" style="background:var(--color-surface);border:1px solid var(--color-border);">
-        <h2 class="text-2xl font-black mb-2" style="color:var(--color-text);">Find Your Name</h2>
+    <section class="mx-auto max-w-5xl px-4 sm:px-6 py-12" data-scroll>
+      <div class="rounded-2xl p-8 sm:p-10" style="background:var(--color-surface);border:1px solid var(--color-border);">
+        <h2 class="text-xl font-black mb-1.5" style="color:var(--color-text);">Find Your Name</h2>
         <p class="text-sm mb-7" style="color:var(--color-text-muted);">
-          Browse signature styles for popular names — pre-made pages for 200+ names worldwide
+          Pre-made signature pages for 200+ popular names worldwide
         </p>
         <div class="flex flex-wrap gap-2 mb-6">
           {POPULAR.map(name => (
             <a href={`/signature/${name.toLowerCase()}/`}
               class="rounded-full px-4 py-1.5 text-sm font-semibold transition-all hover:scale-105"
-              style="background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.2);color:var(--color-text-muted);"
-              onmouseover="this.style.color='#c4b5fd';this.style.borderColor='rgba(167,139,250,0.5)'"
-              onmouseout="this.style.color='var(--color-text-muted)';this.style.borderColor='rgba(167,139,250,0.2)'">
+              style="background:var(--color-surface-2);border:1px solid var(--color-border);color:var(--color-text-muted);"
+              onmouseover="this.style.borderColor='var(--color-accent-border)';this.style.color='var(--color-accent)'"
+              onmouseout="this.style.borderColor='var(--color-border)';this.style.color='var(--color-text-muted)'">
               {name}
             </a>
           ))}
         </div>
-        <a href="/signature/" class="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-all hover:opacity-90"
-          style="background:linear-gradient(135deg,#7c3aed,#a855f7);">
+        <a href="/signature/"
+          class="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-all hover:opacity-90"
+          style="background:var(--color-accent);">
           View All 200+ Names
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
         </a>
       </div>
     </section>
 
     <!-- ── HOW IT WORKS ── -->
-    <section class="mx-auto max-w-4xl px-4 sm:px-6 py-12" data-scroll>
-      <h2 class="text-2xl font-black text-center mb-10" style="color:var(--color-text);">How It Works</h2>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        {[
-          { step: '01', title: 'Type Your Name',    desc: 'Enter your name in the input box — any language, any length.' },
-          { step: '02', title: 'Pick a Style',      desc: 'Choose from 10 hand-crafted calligraphy and cursive styles.' },
-          { step: '03', title: 'Download Free',     desc: 'Click download and get a high-res PNG or vector SVG instantly.' },
-        ].map(s => (
-          <div class="flex flex-col items-center text-center gap-4">
-            <div class="flex h-14 w-14 items-center justify-center rounded-2xl text-xl font-black"
-              style="background:linear-gradient(135deg,rgba(124,58,237,0.2),rgba(168,85,247,0.2));border:1px solid rgba(167,139,250,0.3);color:#a78bfa;">
-              {s.step}
+    <section class="py-14" style="background:var(--color-surface-2);border-top:1px solid var(--color-border);border-bottom:1px solid var(--color-border);" data-scroll>
+      <div class="mx-auto max-w-4xl px-4 sm:px-6">
+        <h2 class="text-2xl font-black text-center mb-10" style="color:var(--color-text);">How It Works</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+          {[
+            { step: '1', title: 'Type Your Name',  desc: 'Enter your name in the input box — any language, any length.' },
+            { step: '2', title: 'Pick a Style',    desc: 'Choose from 10 professional cursive and calligraphy styles.' },
+            { step: '3', title: 'Download Free',   desc: 'Click download and get a high-res PNG or vector SVG instantly.' },
+          ].map(s => (
+            <div class="flex flex-col items-center text-center gap-3">
+              <div class="flex h-12 w-12 items-center justify-center rounded-full text-base font-black text-white"
+                style="background:var(--color-accent);">
+                {s.step}
+              </div>
+              <h3 class="font-bold" style="color:var(--color-text);">{s.title}</h3>
+              <p class="text-sm" style="color:var(--color-text-muted);">{s.desc}</p>
             </div>
-            <h3 class="font-bold" style="color:var(--color-text);">{s.title}</h3>
-            <p class="text-sm" style="color:var(--color-text-muted);">{s.desc}</p>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
 
     <!-- ── FAQ ── -->
-    <section class="mx-auto max-w-3xl px-4 sm:px-6 py-12" data-scroll>
+    <section class="mx-auto max-w-3xl px-4 sm:px-6 py-14" data-scroll>
       <h2 class="text-2xl font-black text-center mb-8" style="color:var(--color-text);">Frequently Asked Questions</h2>
       <div class="space-y-3">
         {[
@@ -154,13 +148,15 @@ const schema = {
             a: 'PNG (3× retina-quality, great for emails and documents) and SVG (infinitely scalable vector, perfect for designers).' },
           { q: 'Does my name get stored anywhere?',
             a: 'No. Everything processes in your browser. We never send your name to a server or store any data.' },
-          { q: 'Can I change the color of my signature?',
-            a: 'Yes — choose from 10 curated colors including midnight navy, violet, rose, forest green, gold, and more.' },
+          { q: 'What are the pen type options?',
+            a: 'Choose from Ballpoint (clean consistent stroke), Ink / Fountain Pen (soft feathering effect), or Gel Pen (smooth vivid output) — each in multiple colors.' },
         ].map(faq => (
-          <details class="group rounded-2xl p-5 transition-all" style="background:var(--color-surface);border:1px solid var(--color-border);">
+          <details class="group rounded-2xl p-5 transition-all style-card" style="background:var(--color-surface);border:1px solid var(--color-border);">
             <summary class="flex cursor-pointer items-center justify-between font-semibold list-none gap-4" style="color:var(--color-text);">
               {faq.q}
-              <svg class="shrink-0 transition-transform duration-200 group-open:rotate-180" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+              <svg class="shrink-0 transition-transform duration-200 group-open:rotate-180" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
             </summary>
             <p class="mt-3 text-sm leading-relaxed" style="color:var(--color-text-muted);">{faq.a}</p>
           </details>
@@ -169,7 +165,7 @@ const schema = {
     </section>
 
     <!-- ── BOTTOM AD ── -->
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 mb-12">
+    <div class="mx-auto max-w-5xl px-4 sm:px-6 mb-12">
       <div class="ad-slot h-[90px]">· advertisement ·</div>
     </div>
 

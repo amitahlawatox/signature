@@ -17,7 +17,7 @@ const { title, description, canonical, ogImage = '/og-image.png', schema, noInde
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#7c3aed" />
+    <meta name="theme-color" content="#1d3f6e" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
@@ -39,60 +39,46 @@ const { title, description, canonical, ogImage = '/og-image.png', schema, noInde
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
     {schema && <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />}
 
-    <!-- Signature site is dark-first -->
+    <!-- Light mode by default; .dark class enables dark mode -->
     <script is:inline>
       (function(){
         try {
-          var s = localStorage.getItem('sm-theme');
-          if (s === 'light') document.documentElement.classList.add('light');
-          // dark is default, no class needed
+          if (localStorage.getItem('sm-theme') === 'dark')
+            document.documentElement.classList.add('dark');
         } catch(e) {}
         window.__toggleTheme = function(){
-          var isLight = document.documentElement.classList.toggle('light');
-          try { localStorage.setItem('sm-theme', isLight ? 'light' : 'dark'); } catch(e) {}
+          var isDark = document.documentElement.classList.toggle('dark');
+          try { localStorage.setItem('sm-theme', isDark ? 'dark' : 'light'); } catch(e) {}
         };
       })();
     </script>
     <slot name="head" />
   </head>
 
-  <body class="min-h-screen antialiased relative" style="background:var(--color-bg);color:var(--color-text);">
-    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-violet-600 focus:px-4 focus:py-2 focus:text-white focus:outline-none">
+  <body class="min-h-screen antialiased" style="background:var(--color-bg);color:var(--color-text);">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:px-4 focus:py-2 focus:text-white focus:outline-none"
+      style="background:var(--color-accent);">
       Skip to content
     </a>
 
-    <!-- Global grid background -->
-    <div class="grid-bg fixed inset-0 -z-10 pointer-events-none" aria-hidden="true"></div>
-
     <slot />
-
-    <div id="cursor-glow" aria-hidden="true"></div>
 
     <script is:inline>
       (function(){
-        var glow = document.getElementById('cursor-glow');
-        var touch = window.matchMedia('(pointer: coarse)').matches;
-        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (glow && !touch && !reduced) {
-          var gx=0,gy=0,cx=0,cy=0;
-          glow.style.opacity = '1';
-          document.addEventListener('mousemove', function(e){ cx=e.clientX; cy=e.clientY; });
-          (function loop(){ gx+=(cx-gx)*0.07; gy+=(cy-gy)*0.07;
-            glow.style.left=gx+'px'; glow.style.top=gy+'px';
-            requestAnimationFrame(loop); })();
-        }
         document.addEventListener('click', function(e){
+          var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (reduced) return;
           var t = e.target.closest('a[href],button');
-          if (!t || reduced) return;
+          if (!t) return;
           var r = t.getBoundingClientRect();
           var rp = document.createElement('span');
           rp.className = 'ripple-effect';
-          rp.style.left = (e.clientX-r.left)+'px';
-          rp.style.top  = (e.clientY-r.top)+'px';
+          rp.style.left = (e.clientX - r.left) + 'px';
+          rp.style.top  = (e.clientY - r.top) + 'px';
           if (getComputedStyle(t).position === 'static') t.style.position = 'relative';
           t.style.overflow = 'hidden';
           t.appendChild(rp);
-          setTimeout(function(){ if(rp.parentNode) rp.parentNode.removeChild(rp); }, 700);
+          setTimeout(function(){ rp.parentNode && rp.parentNode.removeChild(rp); }, 700);
         });
       })();
     </script>

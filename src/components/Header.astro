@@ -1,52 +1,72 @@
 ---
 const pathname = Astro.url.pathname;
 ---
-<header class="sticky top-0 z-40 w-full" style="background:rgba(12,10,24,0.85);border-bottom:1px solid rgba(167,139,250,0.12);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);">
+<header class="sticky top-0 z-40 w-full"
+  style="background:rgba(249,249,247,0.94);border-bottom:1px solid var(--color-border);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);">
+  <style>
+    .dark header { background: rgba(10,10,10,0.95) !important; }
+  </style>
   <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5 sm:px-6">
 
     <!-- Logo -->
-    <a href="/" class="group flex items-center gap-3" aria-label="SignatureMakr home">
-      <div class="relative flex h-9 w-9 items-center justify-center rounded-xl" style="background:linear-gradient(135deg,#7c3aed,#a855f7,#ec4899);">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M17 3 C17 3 9 3 9 8 C9 13 17 11 17 16 C17 21 9 21 9 21" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+    <a href="/" class="group flex items-center gap-2.5" aria-label="SignatureMakr home">
+      <div class="flex h-9 w-9 items-center justify-center rounded-xl"
+        style="background:var(--color-accent);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M17 3 C17 3 9 3 9 8 C9 13 17 11 17 16 C17 21 9 21 9 21"
+            stroke="white" stroke-width="2.2" stroke-linecap="round"/>
         </svg>
-        <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" style="box-shadow:0 0 20px rgba(167,139,250,0.5);"></div>
       </div>
-      <span class="text-xl font-black tracking-tight gradient-text">SignatureMakr</span>
+      <span class="text-xl font-black tracking-tight" style="color:var(--color-accent);">SignatureMakr</span>
     </a>
 
     <!-- Desktop nav -->
     <nav class="hidden items-center gap-1 md:flex" aria-label="Main navigation">
       {[
-        { label: 'Home',     href: '/' },
-        { label: 'By Name',  href: '/signature/' },
-        { label: 'Styles',   href: '/style/' },
-      ].map(l => (
-        <a href={l.href} class={`rounded-lg px-3.5 py-2 text-sm font-semibold transition-all ${pathname === l.href || pathname.startsWith(l.href) && l.href !== '/' ? 'text-violet-400 bg-violet-500/10' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-white/5'}`}>
-          {l.label}
-        </a>
-      ))}
+        { label: 'Home',    href: '/' },
+        { label: 'By Name', href: '/signature/' },
+        { label: 'Styles',  href: '/style/' },
+      ].map(l => {
+        const active = pathname === l.href || (l.href !== '/' && pathname.startsWith(l.href));
+        return (
+          <a href={l.href}
+            class="rounded-lg px-3.5 py-2 text-sm font-semibold transition-all"
+            style={active
+              ? `color:var(--color-accent);background:var(--color-accent-subtle);`
+              : `color:var(--color-text-muted);`}
+            onmouseover={!active ? `this.style.color='var(--color-text)';this.style.background='var(--color-surface-2)'` : undefined}
+            onmouseout={!active ? `this.style.color='var(--color-text-muted)';this.style.background='transparent'` : undefined}
+          >
+            {l.label}
+          </a>
+        );
+      })}
     </nav>
 
     <!-- Right -->
     <div class="flex items-center gap-2">
+      <!-- Theme toggle -->
       <button onclick="window.__toggleTheme()" aria-label="Toggle light/dark mode"
-        class="rounded-xl p-2.5 transition-all hover:bg-white/5"
-        style="color:var(--color-text-muted);">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        class="rounded-xl p-2.5 transition-all"
+        style="color:var(--color-text-muted);"
+        onmouseover="this.style.background='var(--color-surface-2)'"
+        onmouseout="this.style.background='transparent'">
+        <!-- Moon: show in light mode (click to go dark) -->
+        <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun: show in dark mode (click to go light) -->
+        <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="5"/>
-          <line x1="12" y1="1" x2="12" y2="3"/>
-          <line x1="12" y1="21" x2="12" y2="23"/>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-          <line x1="1" y1="12" x2="3" y2="12"/>
-          <line x1="21" y1="12" x2="23" y2="12"/>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
         </svg>
       </button>
-      <a href="/" class="hidden sm:flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
-        style="background:linear-gradient(135deg,#7c3aed,#a855f7);box-shadow:0 4px 20px rgba(124,58,237,0.35);">
+      <a href="/"
+        class="hidden sm:flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold text-white transition-all hover:opacity-90 active:scale-95"
+        style="background:var(--color-accent);">
         ✦ Create Free
       </a>
     </div>
