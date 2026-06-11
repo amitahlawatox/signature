@@ -1,0 +1,125 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import SignatureGenerator from '../../components/SignatureGenerator';
+import { SIGNATURE_FONTS } from '../../lib/fonts';
+
+export function getStaticPaths() {
+  return SIGNATURE_FONTS.map(font => ({
+    params: { id: font.id },
+    props:  { font },
+  }));
+}
+
+const { font } = Astro.props;
+const others = SIGNATURE_FONTS.filter(f => f.id !== font.id);
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": `${font.name} Signature Style — SignatureMakr`,
+  "description": `${font.description} Free online signature generator with ${font.name.toLowerCase()} style. Download PNG or SVG instantly.`,
+};
+---
+
+<Layout
+  title={`${font.name} Signature Style — Free ${font.family} Generator | SignatureMakr`}
+  description={`${font.description} Create a free ${font.name.toLowerCase()} signature with the ${font.family} font. Choose your pen type, paper, and download PNG or SVG.`}
+  canonical={`https://signaturemakr.com/style/${font.id}/`}
+  schema={schema}
+>
+  <Header />
+
+  <main id="main-content" class="grid-bg">
+
+    <!-- ── Breadcrumb ── -->
+    <nav class="mx-auto max-w-5xl px-4 sm:px-6 pt-8" aria-label="Breadcrumb">
+      <ol class="flex items-center gap-2 text-xs" style="color:var(--color-text-muted);">
+        <li><a href="/" class="hover:opacity-80 transition-opacity">Home</a></li>
+        <li aria-hidden="true">›</li>
+        <li><a href="/style/" class="hover:opacity-80 transition-opacity">Styles</a></li>
+        <li aria-hidden="true">›</li>
+        <li style="color:#a78bfa;" aria-current="page">{font.name}</li>
+      </ol>
+    </nav>
+
+    <!-- ── Hero ── -->
+    <section class="mx-auto max-w-5xl px-4 sm:px-6 pt-8 pb-6">
+      <div class="flex flex-wrap items-center gap-3 mb-2">
+        <h1 class="text-3xl font-black sm:text-4xl" style="color:var(--color-text);">
+          <span class="gradient-text">{font.name}</span> Signature Style
+        </h1>
+        <div class="flex gap-2">
+          {font.tags.map(tag => (
+            <span class="text-xs px-2.5 py-1 rounded-full font-semibold capitalize"
+              style="background:rgba(124,58,237,0.08);color:#a78bfa;border:1px solid rgba(167,139,250,0.2);">
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+      <p class="text-base mb-6" style="color:var(--color-text-muted);">{font.description} &mdash; powered by the {font.family} font.</p>
+
+      <!-- Large style preview -->
+      <div class="rounded-2xl overflow-hidden mb-8" style="background:#ffffff;border:1px solid rgba(0,0,0,0.08);box-shadow:0 8px 32px rgba(0,0,0,0.10);">
+        <div class="relative px-10 py-10">
+          <div class="absolute left-10 right-10 border-b border-dashed" style="bottom:28px;border-color:rgba(100,140,255,0.18);"></div>
+          <span
+            class={`relative block leading-none select-none`}
+            style={`font-family:'${font.family}',cursive;font-size:72px;font-weight:${font.weight};color:#1a3a7a;filter:blur(0.3px) opacity(0.88);`}
+            aria-hidden="true"
+          >Your Signature</span>
+        </div>
+        <div class="px-6 py-3 flex items-center justify-between" style="background:rgba(0,0,0,0.02);border-top:1px solid rgba(0,0,0,0.05);">
+          <span class="text-xs font-semibold" style="color:rgba(0,0,0,0.35);">{font.family} · weight {font.weight}</span>
+          <span class="text-xs" style="color:rgba(0,0,0,0.25);">Blue Ballpoint Pen · White Paper</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Generator ── -->
+    <section class="mx-auto max-w-5xl px-4 sm:px-6 pb-16">
+      <h2 class="text-lg font-black mb-6" style="color:var(--color-text);">
+        Try the {font.name} Style
+      </h2>
+      <SignatureGenerator client:load />
+    </section>
+
+    <!-- ── Other styles ── -->
+    <section class="py-12" style="border-top:1px solid var(--color-border);" data-scroll>
+      <div class="mx-auto max-w-5xl px-4 sm:px-6">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-black" style="color:var(--color-text);">Other Styles</h2>
+          <a href="/style/" class="text-sm font-bold hover:opacity-80 transition-opacity" style="color:#a78bfa;">View all →</a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {others.slice(0, 6).map(f => (
+            <a href={`/style/${f.id}/`}
+              class="group rounded-2xl overflow-hidden transition-all"
+              style="background:var(--color-surface);border:1px solid var(--color-border);"
+            >
+              <div class="relative px-6 py-4" style="background:#ffffff;border-bottom:1px solid rgba(0,0,0,0.05);">
+                <div class="absolute left-6 right-6 border-b border-dashed" style="bottom:12px;border-color:rgba(100,140,255,0.15);"></div>
+                <span
+                  class="relative block leading-none select-none whitespace-nowrap overflow-hidden text-ellipsis"
+                  style={`font-family:'${f.family}',cursive;font-size:38px;font-weight:${f.weight};color:#1a3a7a;filter:blur(0.3px) opacity(0.85);`}
+                  aria-hidden="true"
+                >Your Name</span>
+              </div>
+              <div class="px-4 py-3 flex items-center justify-between">
+                <span class="text-xs font-black uppercase tracking-widest" style="color:#a78bfa;">{f.name}</span>
+                <svg class="opacity-30 group-hover:opacity-80 transition-opacity" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:#a78bfa;">
+                  <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                </svg>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <Footer />
+</Layout>
