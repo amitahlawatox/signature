@@ -135,7 +135,7 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
       canvas.removeEventListener('touchmove',  drawStroke as any);
       canvas.removeEventListener('touchend',   endDraw);
     };
-  }, [startDraw, drawStroke, endDraw]);
+  }, [tab, startDraw, drawStroke, endDraw]);
 
   const clearCanvas = useCallback(() => { fillCanvasBg(); setHasStrokes(false); }, [fillCanvasBg]);
 
