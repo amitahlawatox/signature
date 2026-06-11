@@ -1,0 +1,84 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import SignatureGenerator from '../../components/SignatureGenerator';
+import { POPULAR_NAMES, getNameMeta } from '../../lib/names';
+
+export function getStaticPaths() {
+  return POPULAR_NAMES.map(name => ({
+    params: { name: name.toLowerCase() },
+    props: { name },
+  }));
+}
+
+const { name } = Astro.props;
+const meta = getNameMeta(name);
+const cap  = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+
+// Related names (same first letter)
+const related = POPULAR_NAMES
+  .filter(n => n !== name && n.charAt(0).toLowerCase() === name.charAt(0).toLowerCase())
+  .slice(0, 8);
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": meta.title,
+  "description": meta.description,
+  "url": `https://www.signaturemakr.com/signature/${name.toLowerCase()}/`,
+};
+---
+
+<Layout
+  title={meta.title}
+  description={meta.description}
+  canonical={`https://www.signaturemakr.com/signature/${name.toLowerCase()}/`}
+  schema={schema}
+>
+  <Header />
+
+  <main id="main-content" class="mx-auto max-w-6xl px-4 sm:px-6 py-12">
+
+    <!-- Breadcrumb -->
+    <nav class="mb-6 text-sm text-[var(--color-text-muted)]" aria-label="Breadcrumb">
+      <ol class="flex items-center gap-2">
+        <li><a href="/" class="hover:text-violet-600 transition-colors">Home</a></li>
+        <li aria-hidden="true">›</li>
+        <li><a href="/signature/" class="hover:text-violet-600 transition-colors">By Name</a></li>
+        <li aria-hidden="true">›</li>
+        <li class="text-[var(--color-text)] font-medium">{cap}</li>
+      </ol>
+    </nav>
+
+    <h1 class="text-3xl sm:text-4xl font-black mb-3">{meta.h1}</h1>
+    <p class="text-[var(--color-text-muted)] mb-8 max-w-2xl">{meta.intro}</p>
+
+    <!-- Ad slot top -->
+    <div class="ad-slot mb-8 h-24 w-full rounded-2xl" aria-hidden="true">Advertisement</div>
+
+    <!-- Generator pre-filled with this name -->
+    <SignatureGenerator client:load defaultName={cap} />
+
+    <!-- Related names -->
+    {related.length > 0 && (
+      <section class="mt-14" data-scroll>
+        <h2 class="text-xl font-bold mb-4">Other {cap.charAt(0)} Names</h2>
+        <div class="flex flex-wrap gap-2">
+          {related.map(n => (
+            <a href={`/signature/${n.toLowerCase()}/`}
+              class="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-sm font-semibold text-[var(--color-text-muted)] hover:border-violet-400 hover:text-violet-600 transition-all">
+              {n}
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- Ad slot bottom -->
+    <div class="ad-slot mt-10 h-24 w-full rounded-2xl" aria-hidden="true">Advertisement</div>
+
+  </main>
+
+  <Footer />
+</Layout>

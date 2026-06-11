@@ -1,0 +1,56 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { POPULAR_NAMES } from '../../lib/names';
+
+// Group by first letter
+const grouped: Record<string, string[]> = {};
+POPULAR_NAMES.forEach(name => {
+  const letter = name.charAt(0).toUpperCase();
+  if (!grouped[letter]) grouped[letter] = [];
+  grouped[letter].push(name);
+});
+const letters = Object.keys(grouped).sort();
+---
+
+<Layout
+  title="Signature Generator by Name — Browse All Names | SignatureMakr"
+  description="Find a free signature generator for your name. Browse hundreds of names A–Z. Create elegant cursive signatures and download as PNG or SVG instantly."
+  canonical="https://www.signaturemakr.com/signature/"
+>
+  <Header />
+
+  <main id="main-content" class="mx-auto max-w-6xl px-4 sm:px-6 py-12">
+    <h1 class="text-3xl sm:text-4xl font-black mb-3">Signature Generator by Name</h1>
+    <p class="text-[var(--color-text-muted)] mb-10 max-w-2xl">
+      Find your name below to instantly generate beautiful signature styles — completely free, no sign-up required.
+    </p>
+
+    <!-- Ad slot -->
+    <div class="ad-slot mb-10 h-24 w-full rounded-2xl" aria-hidden="true">Advertisement</div>
+
+    <!-- A-Z index -->
+    <div class="flex flex-wrap gap-2 mb-10">
+      {letters.map(l => (
+        <a href={`#letter-${l}`} class="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] w-9 h-9 flex items-center justify-center text-sm font-bold hover:border-violet-400 hover:text-violet-600 transition-all">{l}</a>
+      ))}
+    </div>
+
+    {letters.map(letter => (
+      <section id={`letter-${letter}`} class="mb-10" data-scroll>
+        <h2 class="text-xl font-bold mb-4 text-violet-600 dark:text-violet-400">{letter}</h2>
+        <div class="flex flex-wrap gap-2">
+          {grouped[letter].map(name => (
+            <a href={`/signature/${name.toLowerCase()}/`}
+              class="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-sm font-semibold text-[var(--color-text-muted)] hover:border-violet-400 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all">
+              {name}
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+  </main>
+
+  <Footer />
+</Layout>

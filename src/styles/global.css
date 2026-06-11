@@ -1,0 +1,122 @@
+@import '@fontsource-variable/inter';
+@import '@fontsource/great-vibes/400.css';
+@import '@fontsource/pinyon-script/400.css';
+@import '@fontsource/alex-brush/400.css';
+@import '@fontsource/dancing-script/700.css';
+@import '@fontsource/allura/400.css';
+@import '@fontsource/pacifico/400.css';
+@import '@fontsource/sacramento/400.css';
+@import '@fontsource/mr-dafoe/400.css';
+@import '@fontsource/cookie/400.css';
+@import '@fontsource/yellowtail/400.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg:         #ffffff;
+  --color-surface:    #f8fafc;
+  --color-border:     #e2e8f0;
+  --color-text:       #0f172a;
+  --color-text-muted: #64748b;
+  --color-accent:     #7c3aed;
+  --color-accent-2:   #ec4899;
+}
+
+.dark {
+  --color-bg:         #0f0a1e;
+  --color-surface:    #1a1030;
+  --color-border:     #2d2050;
+  --color-text:       #f1f5f9;
+  --color-text-muted: #94a3b8;
+  --color-accent:     #a78bfa;
+  --color-accent-2:   #f472b6;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter Variable', system-ui, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Scroll reveal ── */
+[data-scroll] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+[data-scroll].scroll-visible {
+  opacity: 1;
+  transform: none;
+}
+[data-scroll="fade"] {
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-scroll] { opacity: 1; transform: none; transition: none; }
+}
+
+/* ── Signature canvas ── */
+#sig-canvas {
+  touch-action: none;
+  cursor: crosshair;
+}
+
+/* ── Font preview classes ── */
+.font-great-vibes    { font-family: 'Great Vibes', cursive; }
+.font-pinyon-script  { font-family: 'Pinyon Script', cursive; }
+.font-alex-brush     { font-family: 'Alex Brush', cursive; }
+.font-dancing-script { font-family: 'Dancing Script', cursive; }
+.font-allura         { font-family: 'Allura', cursive; }
+.font-pacifico       { font-family: 'Pacifico', cursive; }
+.font-sacramento     { font-family: 'Sacramento', cursive; }
+.font-mr-dafoe       { font-family: 'Mr Dafoe', cursive; }
+.font-cookie         { font-family: 'Cookie', cursive; }
+.font-yellowtail     { font-family: 'Yellowtail', cursive; }
+
+/* ── Cursor glow ── */
+#cursor-glow {
+  pointer-events: none;
+  position: fixed;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124,58,237,0.10) 0%, transparent 70%);
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 0;
+}
+
+/* ── Ad slot placeholder ── */
+.ad-slot {
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  min-height: 90px;
+}
+
+/* ── Ripple ── */
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  width: 4px; height: 4px;
+  background: rgba(124, 58, 237, 0.25);
+  transform: scale(0);
+  animation: ripple 0.6s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes ripple {
+  to { transform: scale(80); opacity: 0; }
+}
