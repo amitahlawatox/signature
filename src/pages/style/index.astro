@@ -6,39 +6,44 @@ import { SIGNATURE_FONTS } from '../../lib/fonts';
 
 const schema = {
   "@context": "https://schema.org",
-  "@type": "WebPage",
-  "name": "Signature Styles — SignatureMakr",
-  "description": "Browse 10 free signature styles: calligraphy, elegant script, bold, delicate and more. Preview live and download PNG or SVG.",
-  "url": "https://signaturemakr.com/style/"
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "name": "Signature Styles — Digital Signature Pro",
+      "description": "Browse 10 free signature styles: calligraphy, elegant script, bold, delicate and more. Preview live and download PNG or SVG.",
+      "url": "https://www.digitalsignaturepro.com/style/"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.digitalsignaturepro.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Signature Styles" }
+      ]
+    }
+  ]
 };
 ---
 
 <Layout
-  title="10 Free Signature Styles — Calligraphy, Script, Bold & More | SignatureMakr"
+  title="10 Free Signature Styles — Calligraphy, Script & More | Digital Signature Pro"
   description="Explore 10 professional signature styles — elegant script, calligraphy, bold, delicate, expressive and more. Preview live, pick a pen type, download free."
-  canonical="https://signaturemakr.com/style/"
+  canonical="https://www.digitalsignaturepro.com/style/"
   schema={schema}
 >
   <Header />
 
-  <main id="main-content" class="grid-bg">
+  <main id="main-content">
 
     <!-- ── Hero ── -->
-    <section class="relative overflow-hidden pt-16 pb-12 sm:pt-24 sm:pb-16">
-      <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
-        <div class="absolute -top-20 -right-20 h-[360px] w-[360px] rounded-full opacity-25"
-          style="background:radial-gradient(circle,#7c3aed,transparent 65%);filter:blur(80px);"></div>
-        <div class="absolute top-32 -left-20 h-[280px] w-[280px] rounded-full opacity-15"
-          style="background:radial-gradient(circle,#ec4899,transparent 65%);filter:blur(70px);"></div>
-      </div>
-
+    <section class="pt-16 pb-12 sm:pt-24 sm:pb-16" style="border-bottom:1px solid var(--color-border);">
       <div class="mx-auto max-w-5xl px-4 sm:px-6 text-center">
         <div class="mb-4 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold"
-          style="background:rgba(124,58,237,0.12);border:1px solid rgba(167,139,250,0.25);color:#a78bfa;">
+          style="background:var(--color-accent-subtle);border:1px solid var(--color-accent-border);color:var(--color-accent);">
           ✍️ {SIGNATURE_FONTS.length} Styles Available
         </div>
         <h1 class="text-4xl font-black tracking-tight sm:text-6xl leading-none mb-4">
-          <span class="gradient-text">Signature Styles</span>
+          <span class="gradient-text">Signature</span>
+          <span style="color:var(--color-text);"> Styles</span>
         </h1>
         <p class="mx-auto max-w-xl text-lg mb-8" style="color:var(--color-text-muted);">
           From elegant calligraphy to bold expressive scripts — find the style that matches your personality.
@@ -46,26 +51,25 @@ const schema = {
         </p>
         <a href="/"
           class="inline-flex items-center gap-2 rounded-2xl px-7 py-3.5 text-sm font-black text-white transition-all hover:opacity-90 active:scale-95"
-          style="background:linear-gradient(135deg,#7c3aed,#a855f7,#ec4899);box-shadow:0 8px 32px rgba(124,58,237,0.35);">
+          style="background:var(--color-accent);">
           ✍️ Try the Generator
         </a>
       </div>
     </section>
 
     <!-- ── Style grid ── -->
-    <section class="mx-auto max-w-5xl px-4 sm:px-6 pb-16" data-scroll>
+    <section class="mx-auto max-w-5xl px-4 sm:px-6 py-14" data-scroll>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        {SIGNATURE_FONTS.map((font, i) => (
+        {SIGNATURE_FONTS.map((font) => (
           <a href={`/style/${font.id}/`}
-            class="group rounded-2xl overflow-hidden transition-all"
+            class="group rounded-2xl overflow-hidden style-card transition-all"
             style="background:var(--color-surface);border:1px solid var(--color-border);"
           >
             <!-- Paper preview -->
             <div class="relative px-8 py-6" style="background:#ffffff;border-bottom:1px solid rgba(0,0,0,0.06);">
-              <!-- Ruled line -->
               <div class="absolute left-8 right-8 border-b border-dashed" style="bottom:20px;border-color:rgba(100,140,255,0.18);"></div>
               <span
-                class={`relative block leading-none select-none font-${font.family.toLowerCase().replace(/\s+/g,'-')}`}
+                class="relative block leading-none select-none"
                 style={`font-family:'${font.family}',cursive;font-size:52px;font-weight:${font.weight};color:#1a3a7a;filter:blur(0.3px) opacity(0.88);`}
                 aria-hidden="true"
               >Your Name</span>
@@ -74,14 +78,17 @@ const schema = {
             <div class="p-5 flex items-start justify-between gap-4">
               <div>
                 <div class="flex items-center gap-2 mb-1">
-                  <span class="text-xs font-black uppercase tracking-widest" style="color:#a78bfa;">{font.name}</span>
-                  <span class="text-xs px-2 py-0.5 rounded-full" style="background:rgba(124,58,237,0.08);color:#a78bfa;border:1px solid rgba(167,139,250,0.2);">
+                  <span class="text-xs font-black uppercase tracking-widest" style="color:var(--color-accent);">{font.name}</span>
+                  <span class="text-xs px-2 py-0.5 rounded-full"
+                    style="background:var(--color-accent-subtle);color:var(--color-accent);border:1px solid var(--color-accent-border);">
                     {font.tags[0]}
                   </span>
                 </div>
                 <p class="text-sm" style="color:var(--color-text-muted);">{font.description}</p>
               </div>
-              <svg class="shrink-0 mt-0.5 opacity-40 group-hover:opacity-100 transition-opacity" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:#a78bfa;">
+              <svg class="shrink-0 mt-0.5 opacity-40 group-hover:opacity-100 transition-opacity" width="16" height="16"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                style="color:var(--color-accent);">
                 <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
               </svg>
             </div>
@@ -91,7 +98,7 @@ const schema = {
     </section>
 
     <!-- ── Pen showcase ── -->
-    <section class="py-14" style="border-top:1px solid var(--color-border);" data-scroll>
+    <section class="py-14" style="border-top:1px solid var(--color-border);background:var(--color-surface-2);" data-scroll>
       <div class="mx-auto max-w-5xl px-4 sm:px-6">
         <h2 class="text-2xl font-black text-center mb-2" style="color:var(--color-text);">Realistic Pen Simulation</h2>
         <p class="text-center text-sm mb-10" style="color:var(--color-text-muted);">Each pen type renders with authentic ink physics</p>
@@ -112,7 +119,7 @@ const schema = {
             {
               title: 'Gel Pens',
               icon: '✨',
-              desc: 'Vivid, smooth output with a subtle glow drop-shadow. Bold and vibrant.',
+              desc: 'Vivid, smooth output with a subtle drop-shadow. Bold and vibrant.',
               pens: ['Blue Gel', 'Black Gel', 'Purple Gel'],
             },
           ].map(g => (
@@ -122,7 +129,8 @@ const schema = {
               <p class="text-sm mb-4" style="color:var(--color-text-muted);">{g.desc}</p>
               <div class="flex flex-wrap gap-1.5">
                 {g.pens.map(pen => (
-                  <span class="text-xs px-2.5 py-1 rounded-full" style="background:rgba(124,58,237,0.08);color:#a78bfa;border:1px solid rgba(167,139,250,0.18);">
+                  <span class="text-xs px-2.5 py-1 rounded-full"
+                    style="background:var(--color-accent-subtle);color:var(--color-accent);border:1px solid var(--color-accent-border);">
                     {pen}
                   </span>
                 ))}
@@ -135,8 +143,8 @@ const schema = {
 
     <!-- ── CTA ── -->
     <section class="mx-auto max-w-5xl px-4 sm:px-6 py-12" data-scroll="fade">
-      <div class="rounded-3xl p-10 text-center text-white overflow-hidden relative"
-        style="background:linear-gradient(135deg,#7c3aed 0%,#a855f7 50%,#ec4899 100%);">
+      <div class="rounded-3xl p-10 text-center text-white overflow-hidden"
+        style="background:var(--color-accent);">
         <h2 class="text-2xl font-black mb-2">Ready to Create Your Signature?</h2>
         <p class="mb-6 opacity-90 text-sm">Free, instant PNG & SVG download. No account required.</p>
         <a href="/"

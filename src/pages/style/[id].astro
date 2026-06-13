@@ -17,21 +17,34 @@ const others = SIGNATURE_FONTS.filter(f => f.id !== font.id);
 
 const schema = {
   "@context": "https://schema.org",
-  "@type": "WebPage",
-  "name": `${font.name} Signature Style — SignatureMakr`,
-  "description": `${font.description} Free online signature generator with ${font.name.toLowerCase()} style. Download PNG or SVG instantly.`,
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "name": `${font.name} Signature Style — Digital Signature Pro`,
+      "description": `${font.description} Free online signature generator with ${font.name.toLowerCase()} style. Download PNG or SVG instantly.`,
+      "url": `https://www.digitalsignaturepro.com/style/${font.id}/`
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.digitalsignaturepro.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Styles", "item": "https://www.digitalsignaturepro.com/style/" },
+        { "@type": "ListItem", "position": 3, "name": font.name }
+      ]
+    }
+  ]
 };
 ---
 
 <Layout
-  title={`${font.name} Signature Style — Free ${font.family} Generator | SignatureMakr`}
+  title={`${font.name} Signature Style — Free ${font.family} Generator | Digital Signature Pro`}
   description={`${font.description} Create a free ${font.name.toLowerCase()} signature with the ${font.family} font. Choose your pen type, paper, and download PNG or SVG.`}
-  canonical={`https://signaturemakr.com/style/${font.id}/`}
+  canonical={`https://www.digitalsignaturepro.com/style/${font.id}/`}
   schema={schema}
 >
   <Header />
 
-  <main id="main-content" class="grid-bg">
+  <main id="main-content">
 
     <!-- ── Breadcrumb ── -->
     <nav class="mx-auto max-w-5xl px-4 sm:px-6 pt-8" aria-label="Breadcrumb">
@@ -40,7 +53,7 @@ const schema = {
         <li aria-hidden="true">›</li>
         <li><a href="/style/" class="hover:opacity-80 transition-opacity">Styles</a></li>
         <li aria-hidden="true">›</li>
-        <li style="color:#a78bfa;" aria-current="page">{font.name}</li>
+        <li style="color:var(--color-accent);" aria-current="page">{font.name}</li>
       </ol>
     </nav>
 
@@ -53,7 +66,7 @@ const schema = {
         <div class="flex gap-2">
           {font.tags.map(tag => (
             <span class="text-xs px-2.5 py-1 rounded-full font-semibold capitalize"
-              style="background:rgba(124,58,237,0.08);color:#a78bfa;border:1px solid rgba(167,139,250,0.2);">
+              style="background:var(--color-accent-subtle);color:var(--color-accent);border:1px solid var(--color-accent-border);">
               {tag}
             </span>
           ))}
@@ -91,7 +104,7 @@ const schema = {
       <div class="mx-auto max-w-5xl px-4 sm:px-6">
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-xl font-black" style="color:var(--color-text);">Other Styles</h2>
-          <a href="/style/" class="text-sm font-bold hover:opacity-80 transition-opacity" style="color:#a78bfa;">View all →</a>
+          <a href="/style/" class="text-sm font-bold hover:opacity-80 transition-opacity" style="color:var(--color-accent);">View all →</a>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {others.slice(0, 6).map(f => (
@@ -108,8 +121,8 @@ const schema = {
                 >Your Name</span>
               </div>
               <div class="px-4 py-3 flex items-center justify-between">
-                <span class="text-xs font-black uppercase tracking-widest" style="color:#a78bfa;">{f.name}</span>
-                <svg class="opacity-30 group-hover:opacity-80 transition-opacity" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:#a78bfa;">
+                <span class="text-xs font-black uppercase tracking-widest" style="color:var(--color-accent);">{f.name}</span>
+                <svg class="opacity-30 group-hover:opacity-80 transition-opacity" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color:var(--color-accent);">
                   <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
                 </svg>
               </div>

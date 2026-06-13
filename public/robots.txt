@@ -1,6 +1,6 @@
 User-agent: *
 Allow: /
-Sitemap: https://www.signaturemakr.com/sitemap-index.xml
+Sitemap: https://www.digitalsignaturepro.com/sitemap.xml
 
 User-agent: GPTBot
 Allow: /

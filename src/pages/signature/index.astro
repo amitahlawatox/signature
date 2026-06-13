@@ -4,7 +4,6 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { POPULAR_NAMES } from '../../lib/names';
 
-// Group by first letter
 const grouped: Record<string, string[]> = {};
 POPULAR_NAMES.forEach(name => {
   const letter = name.charAt(0).toUpperCase();
@@ -12,44 +11,82 @@ POPULAR_NAMES.forEach(name => {
   grouped[letter].push(name);
 });
 const letters = Object.keys(grouped).sort();
+
+const schema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebPage",
+      "name": "Signature Generator by Name — Digital Signature Pro",
+      "url": "https://www.digitalsignaturepro.com/signature/"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.digitalsignaturepro.com/" },
+        { "@type": "ListItem", "position": 2, "name": "Signatures by Name" }
+      ]
+    }
+  ]
+};
 ---
 
 <Layout
-  title="Signature Generator by Name — Browse All Names | SignatureMakr"
+  title="Signature Generator by Name — Browse All Names | Digital Signature Pro"
   description="Find a free signature generator for your name. Browse hundreds of names A–Z. Create elegant cursive signatures and download as PNG or SVG instantly."
-  canonical="https://www.signaturemakr.com/signature/"
+  canonical="https://www.digitalsignaturepro.com/signature/"
+  schema={schema}
 >
   <Header />
 
   <main id="main-content" class="mx-auto max-w-6xl px-4 sm:px-6 py-12">
-    <h1 class="text-3xl sm:text-4xl font-black mb-3">Signature Generator by Name</h1>
-    <p class="text-[var(--color-text-muted)] mb-10 max-w-2xl">
+
+    <nav class="mb-4 text-sm" style="color:var(--color-text-muted);" aria-label="Breadcrumb">
+      <ol class="flex items-center gap-2">
+        <li><a href="/" class="hover:opacity-80 transition-opacity">Home</a></li>
+        <li aria-hidden="true">›</li>
+        <li style="color:var(--color-text);">Signatures by Name</li>
+      </ol>
+    </nav>
+
+    <h1 class="text-3xl sm:text-4xl font-black mb-3" style="color:var(--color-text);">Signature Generator by Name</h1>
+    <p class="mb-10 max-w-2xl" style="color:var(--color-text-muted);">
       Find your name below to instantly generate beautiful signature styles — completely free, no sign-up required.
     </p>
 
     <!-- Ad slot -->
     <div class="ad-slot mb-10 h-24 w-full rounded-2xl" aria-hidden="true">Advertisement</div>
 
-    <!-- A-Z index -->
+    <!-- A-Z jump links -->
     <div class="flex flex-wrap gap-2 mb-10">
       {letters.map(l => (
-        <a href={`#letter-${l}`} class="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] w-9 h-9 flex items-center justify-center text-sm font-bold hover:border-violet-400 hover:text-violet-600 transition-all">{l}</a>
+        <a href={`#letter-${l}`}
+          class="rounded-lg w-9 h-9 flex items-center justify-center text-sm font-bold transition-all"
+          style="border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text-muted);"
+          onmouseover="this.style.borderColor='var(--color-accent-border)';this.style.color='var(--color-accent)'"
+          onmouseout="this.style.borderColor='var(--color-border)';this.style.color='var(--color-text-muted)'">
+          {l}
+        </a>
       ))}
     </div>
 
     {letters.map(letter => (
       <section id={`letter-${letter}`} class="mb-10" data-scroll>
-        <h2 class="text-xl font-bold mb-4 text-violet-600 dark:text-violet-400">{letter}</h2>
+        <h2 class="text-xl font-bold mb-4" style="color:var(--color-accent);">{letter}</h2>
         <div class="flex flex-wrap gap-2">
           {grouped[letter].map(name => (
             <a href={`/signature/${name.toLowerCase()}/`}
-              class="rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-sm font-semibold text-[var(--color-text-muted)] hover:border-violet-400 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all">
+              class="rounded-full px-4 py-2 text-sm font-semibold transition-all"
+              style="border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text-muted);"
+              onmouseover="this.style.borderColor='var(--color-accent-border)';this.style.color='var(--color-accent)'"
+              onmouseout="this.style.borderColor='var(--color-border)';this.style.color='var(--color-text-muted)'">
               {name}
             </a>
           ))}
         </div>
       </section>
     ))}
+
   </main>
 
   <Footer />
