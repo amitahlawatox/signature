@@ -1,0 +1,114 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "AboutPage",
+  "name": "About Digital Signature Pro",
+  "url": "https://www.digitalsignaturepro.com/about/",
+  "description": "Learn about Digital Signature Pro — the free online signature generator built for professionals, students, and creatives worldwide.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Digital Signature Pro",
+    "url": "https://www.digitalsignaturepro.com",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.digitalsignaturepro.com/favicon.svg"
+    }
+  }
+};
+---
+
+<Layout
+  title="About Digital Signature Pro — Free Online Signature Generator"
+  description="Digital Signature Pro is a free online signature generator trusted by professionals, students, and creatives. Create beautiful cursive signatures in seconds — no sign-up required."
+  canonical="https://www.digitalsignaturepro.com/about/"
+  schema={schema}
+>
+  <Header />
+
+  <main id="main-content">
+    <section class="pt-16 pb-12 sm:pt-24 sm:pb-16" style="border-bottom:1px solid var(--color-border);">
+      <div class="mx-auto max-w-3xl px-4 sm:px-6">
+
+        <div class="mb-5 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold"
+          style="background:var(--color-accent-subtle);border:1px solid var(--color-accent-border);color:var(--color-accent);"
+          data-scroll="fade">
+          Our Story
+        </div>
+
+        <h1 class="text-4xl font-black tracking-tight sm:text-5xl mb-5" style="color:var(--color-text);" data-scroll="fade">
+          About <span class="gradient-text">Digital Signature Pro</span>
+        </h1>
+
+        <p class="text-lg leading-relaxed mb-4" style="color:var(--color-text-muted);" data-scroll="fade">
+          Digital Signature Pro is a free online signature generator built for everyone — professionals signing documents, students personalizing assignments, artists branding their work, and creatives expressing their identity.
+        </p>
+
+        <p class="text-base leading-relaxed mb-4" style="color:var(--color-text-muted);">
+          We believe a great signature should be accessible to everyone, not locked behind a paywall or a mandatory account. That's why our tool is 100% free, requires no sign-up, and works instantly in your browser.
+        </p>
+
+        <p class="text-base leading-relaxed mb-12" style="color:var(--color-text-muted);">
+          Everything is processed client-side — your name never leaves your device. No data stored, no cookies tracked, no ads profiling you. Just a fast, private tool that does exactly what you need.
+        </p>
+
+        <!-- WHAT WE OFFER -->
+        <h2 class="text-2xl font-black mb-6" style="color:var(--color-text);">What We Offer</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12">
+          {[
+            { icon: '✍️', title: '10 Professional Styles', desc: 'Choose from elegant cursive, calligraphy, refined script, natural handwriting, and expressive brush styles — all rendered with self-hosted fonts.' },
+            { icon: '⚡', title: 'Instant Live Preview', desc: 'See your signature update in real time as you type. No waiting, no page reloads.' },
+            { icon: '📥', title: 'PNG & SVG Downloads', desc: 'Download a high-resolution 3× retina PNG for emails and documents, or a scalable SVG for design tools like Figma and Illustrator.' },
+            { icon: '🖊️', title: 'Realistic Pen Effects', desc: 'Simulate ballpoint, fountain pen, and gel pen effects with CSS ink rendering for authentic-looking signatures.' },
+            { icon: '🔒', title: 'Private by Design', desc: 'Your name stays in your browser. We store nothing, track nothing, and require no account.' },
+            { icon: '📱', title: 'Works on Any Device', desc: 'Fully responsive and tested on mobile, tablet, and desktop. No app download required.' },
+          ].map(f => (
+            <div class="rounded-2xl p-6" style="background:var(--color-surface);border:1px solid var(--color-border);">
+              <div class="text-2xl mb-3">{f.icon}</div>
+              <h3 class="font-bold mb-1.5" style="color:var(--color-text);">{f.title}</h3>
+              <p class="text-sm leading-relaxed" style="color:var(--color-text-muted);">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        <!-- WHO USES IT -->
+        <h2 class="text-2xl font-black mb-4" style="color:var(--color-text);">Who Uses Digital Signature Pro?</h2>
+        <ul class="space-y-3 mb-12 text-base" style="color:var(--color-text-muted);">
+          <li class="flex items-start gap-2"><span style="color:var(--color-accent);">→</span> <span><strong style="color:var(--color-text);">Professionals</strong> who want a consistent, polished signature for emails and PDFs.</span></li>
+          <li class="flex items-start gap-2"><span style="color:var(--color-accent);">→</span> <span><strong style="color:var(--color-text);">Students</strong> personalizing assignments, cover letters, and thesis documents.</span></li>
+          <li class="flex items-start gap-2"><span style="color:var(--color-accent);">→</span> <span><strong style="color:var(--color-text);">Artists & Creatives</strong> adding a handwritten signature to artwork and social media profiles.</span></li>
+          <li class="flex items-start gap-2"><span style="color:var(--color-accent);">→</span> <span><strong style="color:var(--color-text);">Developers & Designers</strong> needing signature assets for mockups, templates, or UI demos.</span></li>
+          <li class="flex items-start gap-2"><span style="color:var(--color-accent);">→</span> <span><strong style="color:var(--color-text);">Anyone</strong> who wants a beautiful signature without spending hours practicing calligraphy.</span></li>
+        </ul>
+
+        <!-- CONTACT -->
+        <h2 class="text-2xl font-black mb-4" style="color:var(--color-text);">Get in Touch</h2>
+        <p class="text-base leading-relaxed mb-3" style="color:var(--color-text-muted);">
+          We'd love to hear from you — whether it's a feature request, a bug report, or just a hello.
+        </p>
+        <a href="mailto:contact@digitalsignaturepro.com"
+          class="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-all hover:opacity-90"
+          style="background:var(--color-accent);">
+          contact@digitalsignaturepro.com
+        </a>
+
+        <div class="mt-12 pt-8" style="border-top:1px solid var(--color-border);">
+          <a href="/"
+            class="inline-flex items-center gap-2 text-sm font-semibold transition-colors"
+            style="color:var(--color-accent);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Back to Signature Generator
+          </a>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>

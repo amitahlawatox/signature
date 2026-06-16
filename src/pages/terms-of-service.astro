@@ -1,0 +1,142 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+const lastUpdated = "June 13, 2026";
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Terms of Service — Digital Signature Pro",
+  "url": "https://www.digitalsignaturepro.com/terms-of-service/",
+  "description": "Terms of Service for Digital Signature Pro. Free to use, no warranties. Signatures are for stylistic purposes — not legally binding e-signatures.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Digital Signature Pro",
+    "url": "https://www.digitalsignaturepro.com"
+  }
+};
+---
+
+<Layout
+  title="Terms of Service — Digital Signature Pro"
+  description="Terms of Service for Digital Signature Pro. Free to use for personal and commercial purposes. Signatures are stylistic — not legally binding e-signatures."
+  canonical="https://www.digitalsignaturepro.com/terms-of-service/"
+  schema={schema}
+>
+  <Header />
+
+  <main id="main-content">
+    <section class="pt-16 pb-12 sm:pt-24 sm:pb-16">
+      <div class="mx-auto max-w-3xl px-4 sm:px-6">
+
+        <h1 class="text-4xl font-black tracking-tight sm:text-5xl mb-3" style="color:var(--color-text);">
+          Terms of Service
+        </h1>
+        <p class="text-sm mb-10" style="color:var(--color-text-muted);">Last updated: {lastUpdated}</p>
+
+        <div class="rounded-2xl p-5 mb-10" style="background:var(--color-accent-subtle);border:1px solid var(--color-accent-border);">
+          <p class="text-sm font-semibold" style="color:var(--color-accent);">
+            ⚡ Short version: Use the tool freely for personal or commercial work. Don't misuse it. Signatures generated here are stylistic — not legally binding e-signatures.
+          </p>
+        </div>
+
+        <div class="space-y-10" style="color:var(--color-text-muted);">
+
+          <div>
+            <h2 class="text-xl font-black mb-3" style="color:var(--color-text);">1. Acceptance of Terms</h2>
+            <p class="text-base leading-relaxed">
+              By accessing or using Digital Signature Pro at <a href="https://www.digitalsignaturepro.com" style="color:var(--color-accent);">www.digitalsignaturepro.com</a>, you agree to be bound by these Terms of Service. If you do not agree, please do not use our service.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-black mb-3" style="color:var(--color-text);">2. Description of Service</h2>
+            <p class="text-base leading-relaxed">
+              Digital Signature Pro provides a free, browser-based tool that generates stylistic signature images based on text input. The service is provided "as is" at no cost. We reserve the right to modify, suspend, or discontinue the service at any time without notice.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-black mb-3" style="color:var(--color-text);">3. Permitted Use</h2>
+            <p class="text-base leading-relaxed mb-3">You may use Digital Signature Pro to:</p>
+            <ul class="space-y-2 text-sm list-none">
+              <li class="flex items-start gap-2"><span style="color:var(--color-accent);">✓</span> <span>Generate signature images for personal use (emails, social media, creative projects).</span></li>
+              <li class="flex items-start gap-2"><span style="color:var(--color-accent);">✓</span> <span>Generate signature images for commercial use (brand assets, documents, design mockups).</span></li>
+              <li class="flex items-start gap-2"><span style="color:var(--color-accent);">✓</span> <span>Download and use generated PNG and SVG files freely, with no attribution required.</span></li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-black mb-3" style="color:var(--color-text);">4. Prohibited Use</h2>
+            <p class="text-base leading-relaxed mb-3">You may not use Digital Signature Pro to:</p>
+            <ul class="space-y-2 text-sm list-none">
+              <li class="flex items-start gap-2"><span style="color:#dc2626);">✗</span> <span>Forge, impersonate, or fraudulently represent another person's signature.</span></li>
+              <li class="flex items-start gap-2"><span style="color:#dc2626);">✗</span> <span>Use generated signatures as legally binding electronic signatures under e-signature laws (e.g., ESIGN Act, eIDAS) — use a dedicated legal e-signature service for that purpose.</span></li>
+              <li class="flex items-start gap-2"><span style="color:#dc2626);">✗</span> <span>Scrape, bot, or automate bulk use of the service in ways that degrade performance for other users.</span></li>
+              <li class="flex items-start gap-2"><span style="color:#dc2626);">✗</span> <span>Use the service for any illegal, fraudulent, or harmful activity.</span></li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-black mb-3" style="color:var(--color-text);">5. Intellectual Property</h2>
+            <p class="text-base leading-relaxed">
+              The signature images you generate are based on your own text input. You own the output. The fonts used are licensed under the <strong style="color:var(--color-text);">SIL Open Font License (OFL)</strong>, which permits free use in personal and commercial projects. The website design, code, and branding remain the property of Digital Signature Pro.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-black mb-3" style="color:var(--color-text);">6. Disclaimer of Warranties</h2>
+            <p class="text-base leading-relaxed">
+              The service is provided <strong style="color:var(--color-text);">"as is"</strong> and <strong style="color:var(--color-text);">"as available"</strong> without warranties of any kind, express or implied, including but not limited to merchantability, fitness for a particular purpose, or non-infringement. We do not guarantee the service will be uninterrupted, error-free, or available at all times.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-black mb-3" style="color:var(--color-text);">7. Limitation of Liability</h2>
+            <p class="text-base leading-relaxed">
+              To the maximum extent permitted by law, Digital Signature Pro shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of or inability to use the service — including but not limited to loss of data, profits, or business opportunities.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-black mb-3" style="color:var(--color-text);">8. Changes to Terms</h2>
+            <p class="text-base leading-relaxed">
+              We may update these terms at any time. We will indicate the revision date at the top of this page. Continued use of the service after any changes constitutes your acceptance of the new terms.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-black mb-3" style="color:var(--color-text);">9. Governing Law</h2>
+            <p class="text-base leading-relaxed">
+              These terms are governed by the laws of the jurisdiction in which Digital Signature Pro operates, without regard to conflict-of-law principles.
+            </p>
+          </div>
+
+          <div>
+            <h2 class="text-xl font-black mb-3" style="color:var(--color-text);">10. Contact</h2>
+            <p class="text-base leading-relaxed">
+              Questions about these terms? Email us at <a href="mailto:contact@digitalsignaturepro.com" style="color:var(--color-accent);">contact@digitalsignaturepro.com</a>.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="mt-12 pt-8" style="border-top:1px solid var(--color-border);">
+          <a href="/"
+            class="inline-flex items-center gap-2 text-sm font-semibold transition-colors"
+            style="color:var(--color-accent);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Back to Signature Generator
+          </a>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
