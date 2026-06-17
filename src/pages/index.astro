@@ -7,7 +7,20 @@ import { POPULAR_NAMES } from '../lib/names';
 
 const POPULAR = POPULAR_NAMES.slice(0, 24);
 
-const schema = {
+const faqs = [
+  { q: 'Is Digital Signature Pro really free?',
+    a: 'Yes — completely free, forever. No subscription, no watermark, no hidden fees.' },
+  { q: 'Can I use my signature on legal documents?',
+    a: 'Digital Signature Pro creates stylistic signatures for emails, social media, and creative work. For legally binding e-signatures, use a dedicated e-sign service.' },
+  { q: 'What formats can I download?',
+    a: 'PNG (3× retina-quality, great for emails and documents) and SVG (infinitely scalable vector, perfect for designers).' },
+  { q: 'Does my name get stored anywhere?',
+    a: 'No. Everything processes in your browser. We never send your name to a server or store any data.' },
+  { q: 'What are the pen type options?',
+    a: 'Choose from Ballpoint (clean consistent stroke), Ink / Fountain Pen (soft feathering effect), or Gel Pen (smooth vivid output) — each in multiple colors.' },
+];
+
+const webAppSchema = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "name": "Digital Signature Pro — Free Online Signature Generator",
@@ -17,11 +30,23 @@ const schema = {
   "operatingSystem": "Any",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
 };
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map(f => ({
+    "@type": "Question",
+    "name": f.q,
+    "acceptedAnswer": { "@type": "Answer", "text": f.a }
+  }))
+};
+
+const schema = [webAppSchema, faqSchema];
 ---
 
 <Layout
   title="Free Signature Generator — Create Professional Signatures Online | Digital Signature Pro"
-  description="Create a professional free digital signature in seconds. 10 elegant cursive & calligraphy styles. Type your name, customize color & size, download PNG or SVG. No sign-up needed."
+  description="Create a free professional signature in seconds. 10 cursive & calligraphy styles. Customize color & size, then download as PNG or SVG. No sign-up."
   canonical="https://www.digitalsignaturepro.com/"
   schema={schema}
 >
@@ -63,7 +88,7 @@ const schema = {
 
     <!-- ── FEATURES ── -->
     <section class="mx-auto max-w-5xl px-4 sm:px-6 py-12" data-scroll>
-      <h2 class="text-2xl font-black text-center mb-2" style="color:var(--color-text);">Why SignatureMakr?</h2>
+      <h2 class="text-2xl font-black text-center mb-2" style="color:var(--color-text);">Why Digital Signature Pro?</h2>
       <p class="text-center mb-10 text-sm" style="color:var(--color-text-muted);">Built different from the competition</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {[
@@ -139,18 +164,7 @@ const schema = {
     <section class="mx-auto max-w-3xl px-4 sm:px-6 py-14" data-scroll>
       <h2 class="text-2xl font-black text-center mb-8" style="color:var(--color-text);">Frequently Asked Questions</h2>
       <div class="space-y-3">
-        {[
-          { q: 'Is SignatureMakr really free?',
-            a: 'Yes — completely free, forever. No subscription, no watermark, no hidden fees.' },
-          { q: 'Can I use my signature on legal documents?',
-            a: 'SignatureMakr creates stylistic signatures for emails, social media, and creative work. For legally binding e-signatures, use a dedicated e-sign service.' },
-          { q: 'What formats can I download?',
-            a: 'PNG (3× retina-quality, great for emails and documents) and SVG (infinitely scalable vector, perfect for designers).' },
-          { q: 'Does my name get stored anywhere?',
-            a: 'No. Everything processes in your browser. We never send your name to a server or store any data.' },
-          { q: 'What are the pen type options?',
-            a: 'Choose from Ballpoint (clean consistent stroke), Ink / Fountain Pen (soft feathering effect), or Gel Pen (smooth vivid output) — each in multiple colors.' },
-        ].map(faq => (
+        {faqs.map(faq => (
           <details class="group rounded-2xl p-5 transition-all style-card" style="background:var(--color-surface);border:1px solid var(--color-border);">
             <summary class="flex cursor-pointer items-center justify-between font-semibold list-none gap-4" style="color:var(--color-text);">
               {faq.q}

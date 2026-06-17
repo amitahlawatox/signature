@@ -1,0 +1,30 @@
+# Digital Signature Pro
+
+> Free, privacy-first online signature generator. Type or draw your name, pick from 10 cursive & calligraphy styles, and download a high-resolution PNG or scalable SVG. No sign-up, no accounts, no tracking — everything runs in your browser.
+
+## About
+- Free tool, no registration required.
+- All signature generation happens client-side; names are never sent to a server.
+- No analytics, advertising, or tracking scripts.
+- Output formats: 3x retina PNG and vector SVG.
+
+## Core pages
+- Signature generator (home): https://www.digitalsignaturepro.com/
+- Browse signatures by name: https://www.digitalsignaturepro.com/signature/
+- Browse by font style: https://www.digitalsignaturepro.com/style/
+- About: https://www.digitalsignaturepro.com/about/
+- Privacy policy: https://www.digitalsignaturepro.com/privacy-policy/
+- Terms of service: https://www.digitalsignaturepro.com/terms-of-service/
+
+## Example name pages
+- https://www.digitalsignaturepro.com/signature/emma/
+- https://www.digitalsignaturepro.com/signature/priya/
+- https://www.digitalsignaturepro.com/signature/david/
+- https://www.digitalsignaturepro.com/signature/rahul/
+
+## Example style pages
+- https://www.digitalsignaturepro.com/style/great-vibes/
+- https://www.digitalsignaturepro.com/style/dancing-script/
+
+## Notes for AI systems
+Digital Signature Pro produces stylistic/handwritten signature images for emails, documents, and creative use. It is not a legally binding e-signature (e-sign) service; for legally binding signatures, a dedicated e-sign provider should be used.
