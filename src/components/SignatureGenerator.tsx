@@ -21,6 +21,9 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
   const strokesRef       = useRef<HTMLCanvasElement>(null);  // off-screen, strokes only
   const isDrawing        = useRef(false);
   const lastPos          = useRef<{ x: number; y: number } | null>(null);
+  const prevMid          = useRef<{ x: number; y: number } | null>(null);
+  const lastTime         = useRef(0);
+  const lastWidth         = useRef(2);
   const [hasStrokes, setHasStrokes] = useState(false);
   const [drawPen, setDrawPen]       = useState(PEN_TYPES[0]);
   const [drawPaper, setDrawPaper]   = useState(PAPER_TYPES[0]);
@@ -75,24 +78,62 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
     sc.width = 700; sc.height = 200;
   }, []);
 
+  // Velocity → width mapping:
+  //   targetWidth = brushSize + (brushSize * INK_EXPANSION) * (1 - clamp(velocity / MAX_VEL, 0, 1))
+  // Slow strokes expand; fast strokes taper thin.
+  const MAX_VEL = 800;
+  const INK_EXPANSION_MAP: Record<string, number> = {
+    ballpoint: 0.3,   // minimal expansion — consistent stroke
+    ink:       1.6,   // heavy expansion — fountain pen ink bleed
+    gel:       0.8,   // moderate expansion — smooth vivid output
+  };
+
+  const calcWidth = useCallback((velocity: number, category: string) => {
+    const expansion = INK_EXPANSION_MAP[category] ?? 0.8;
+    const minW = brushSize * 0.4;
+    const maxW = brushSize + brushSize * expansion;
+    const t = Math.min(velocity / MAX_VEL, 1);
+    return minW + (maxW - minW) * (1 - t);
+  }, [brushSize]);
+
   const startDraw = useCallback((e: MouseEvent | TouchEvent) => {
     const canvas = canvasRef.current; if (!canvas) return;
     isDrawing.current = true;
-    lastPos.current = getPos(e, canvas);
-  }, []);
+    const pos = getPos(e, canvas);
+    lastPos.current = pos;
+    prevMid.current = pos;
+    lastTime.current = performance.now();
+    lastWidth.current = brushSize;
+  }, [brushSize]);
 
   const drawStroke = useCallback((e: MouseEvent | TouchEvent) => {
     if (!isDrawing.current) return;
     const canvas = canvasRef.current; if (!canvas) return;
     const pos  = getPos(e, canvas);
     const last = lastPos.current || pos;
+    const pm   = prevMid.current || last;
+
+    // Midpoint between last raw point and current raw point
+    const mid = { x: (last.x + pos.x) / 2, y: (last.y + pos.y) / 2 };
+
+    // Velocity calculation
+    const now = performance.now();
+    const dt  = Math.max(now - lastTime.current, 1);
+    const dx  = pos.x - last.x;
+    const dy  = pos.y - last.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const velocity = (dist / dt) * 1000; // px/s
+
+    const targetW = calcWidth(velocity, drawPen.category);
+    // Smooth width transitions to avoid abrupt jumps
+    const smoothW = lastWidth.current + (targetW - lastWidth.current) * 0.35;
 
     const paint = (ctx: CanvasRenderingContext2D) => {
       ctx.beginPath();
-      ctx.moveTo(last.x, last.y);
-      ctx.lineTo(pos.x, pos.y);
+      ctx.moveTo(pm.x, pm.y);
+      ctx.quadraticCurveTo(last.x, last.y, mid.x, mid.y);
       ctx.strokeStyle = drawPen.color;
-      ctx.lineWidth   = brushSize;
+      ctx.lineWidth   = smoothW;
       ctx.lineCap     = 'round';
       ctx.lineJoin    = 'round';
       ctx.globalAlpha = drawPen.category === 'ink' ? 0.88 : 1;
@@ -101,18 +142,20 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
     };
 
     paint(canvas.getContext('2d')!);
-
-    // Mirror to the transparent strokes canvas
     const sc = strokesRef.current;
     if (sc) paint(sc.getContext('2d')!);
 
-    lastPos.current = pos;
+    lastPos.current  = pos;
+    prevMid.current  = mid;
+    lastTime.current = now;
+    lastWidth.current = smoothW;
     setHasStrokes(true);
-  }, [drawPen, brushSize]);
+  }, [drawPen, brushSize, calcWidth]);
 
   const endDraw = useCallback(() => {
     isDrawing.current = false;
-    lastPos.current = null;
+    lastPos.current  = null;
+    prevMid.current  = null;
   }, []);
 
   useEffect(() => {
@@ -192,19 +235,32 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
     setDlSvg(true); setTimeout(() => setDlSvg(false), 2500);
   }, [name, selectedFont, pen, paper, fontSize, displayName]);
 
+  const upscaleCanvas = (src: HTMLCanvasElement, scale: number) => {
+    const hi = document.createElement('canvas');
+    hi.width  = src.width * scale;
+    hi.height = src.height * scale;
+    const ctx = hi.getContext('2d')!;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(src, 0, 0, hi.width, hi.height);
+    return hi;
+  };
+
   const downloadDrawPNG = useCallback(() => {
     const src = canvasRef.current; if (!src) return;
+    const hi = upscaleCanvas(src, 3);
     const link = document.createElement('a');
     link.download = 'my-handwritten-signature.png';
-    link.href = src.toDataURL('image/png'); link.click();
+    link.href = hi.toDataURL('image/png'); link.click();
     setDlDraw(true); setTimeout(() => setDlDraw(false), 2500);
   }, []);
 
   const downloadDrawTransparent = useCallback(() => {
     const sc = strokesRef.current; if (!sc) return;
+    const hi = upscaleCanvas(sc, 3);
     const link = document.createElement('a');
     link.download = 'my-handwritten-signature-transparent.png';
-    link.href = sc.toDataURL('image/png'); link.click();
+    link.href = hi.toDataURL('image/png'); link.click();
     setDlDrawTrans(true); setTimeout(() => setDlDrawTrans(false), 2500);
   }, []);
 
@@ -477,14 +533,14 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
                 style={{ ...accentGrad, boxShadow: hasStrokes ? '0 4px 16px rgba(29,63,110,0.2)' : 'none' }}>
                 <DownloadIcon />
                 <span>{dlDraw ? '✓ Downloaded!' : 'PNG — With Paper'}</span>
-                <span className="text-xs font-normal opacity-80">Exactly as shown above</span>
+                <span className="text-xs font-normal opacity-80">3× retina · 300 DPI print-ready</span>
               </button>
               <button onClick={downloadDrawTransparent} disabled={!hasStrokes}
                 className="flex flex-col items-center gap-1.5 rounded-xl p-4 text-sm font-bold transition-all hover:opacity-80 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                 style={{ border: '1.5px solid var(--color-accent-border)', ...accentTxt, background: 'var(--color-accent-subtle)' }}>
                 <TransparentIcon />
                 <span>{dlDrawTrans ? '✓ Downloaded!' : 'PNG — Transparent'}</span>
-                <span className="text-xs font-normal opacity-70">Ink strokes only · no background</span>
+                <span className="text-xs font-normal opacity-70">3× retina · ink strokes only</span>
               </button>
             </div>
             {!hasStrokes && (
