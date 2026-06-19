@@ -77,7 +77,6 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
 
   const startDraw = useCallback((e: MouseEvent | TouchEvent) => {
     const canvas = canvasRef.current; if (!canvas) return;
-    e.preventDefault();
     isDrawing.current = true;
     lastPos.current = getPos(e, canvas);
   }, []);
@@ -85,7 +84,6 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
   const drawStroke = useCallback((e: MouseEvent | TouchEvent) => {
     if (!isDrawing.current) return;
     const canvas = canvasRef.current; if (!canvas) return;
-    e.preventDefault();
     const pos  = getPos(e, canvas);
     const last = lastPos.current || pos;
 
@@ -123,8 +121,8 @@ export default function SignatureGenerator({ defaultName = '' }: Props) {
     canvas.addEventListener('mousemove',  drawStroke as any);
     canvas.addEventListener('mouseup',    endDraw);
     canvas.addEventListener('mouseleave', endDraw);
-    canvas.addEventListener('touchstart', startDraw as any, { passive: false });
-    canvas.addEventListener('touchmove',  drawStroke as any, { passive: false });
+    canvas.addEventListener('touchstart', startDraw as any, { passive: true });
+    canvas.addEventListener('touchmove',  drawStroke as any, { passive: true });
     canvas.addEventListener('touchend',   endDraw);
     return () => {
       canvas.removeEventListener('mousedown',  startDraw as any);
